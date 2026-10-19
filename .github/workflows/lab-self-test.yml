@@ -1,0 +1,69 @@
+# Self-test of the FireLab lab action (action/action.yml) from this repo's
+# own build: wraps the Firefly Lake demo (examples/web-game) into an APK,
+# boots a Fire-TV-shaped emulator for each model and runs the smoke checks.
+name: Lab self-test
+
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'action/**', 'profiles/**', 'android-template/**', 'examples/web-game/**', '.github/workflows/lab-self-test.yml']
+  pull_request:
+    paths: ['src/**', 'action/**', 'profiles/**', 'android-template/**', 'examples/web-game/**', '.github/workflows/lab-self-test.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lab-self-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test
+
+  lab:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [AFTSSS, AFTMA08C15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Serve the demo game
+        run: |
+          PORT=8080 nohup node examples/web-game/serve.mjs > serve.log 2>&1 &
+          for _ in $(seq 1 20); do curl -fsS http://127.0.0.1:8080/examples/web-game/ > /dev/null && exit 0; sleep 0.5; done
+          cat serve.log
+          exit 1
+      - id: lab
+        uses: ./action
+        with:
+          url: http://localhost:8080/examples/web-game/
+          name: Firefly Lake
+          package: dev.firelab.fireflylake
+          profile: ${{ matrix.profile }}
+          command: node ${{ github.workspace }}/dist/cli.js
+          artifact-name: firelab-lab-${{ matrix.profile }}
+          explore: auto
+          explore-minutes: '2'
+      - name: Show the verdict
+        if: always()
+        run: echo "verdict=${{ steps.lab.outputs.verdict }} serial=${{ steps.lab.outputs.serial }}"

@@ -1,0 +1,20 @@
+export {
+  CHIPS,
+  FIRE_TV_MODELS,
+  classifyGpu,
+  classifyDevice,
+  parseUserAgent,
+  cleanGpuName,
+  readGpu,
+  detectDevice,
+  TIERS,
+  TIER_IDS,
+  TIER_ALIASES,
+  isTier,
+  normalizeTier,
+  lighterTier,
+  richerTier,
+  capTier,
+  pick,
+} from './index.js';
+export type { ChipEntry, Detection, GpuInfo, Platform, UaInfo, TierId, TierPreset } from './index.js';

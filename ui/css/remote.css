@@ -1,0 +1,435 @@
+/* The virtual remote: a matte graphite handset, the same in both themes like
+ * real hardware. Raised keys press down, the D-pad ring and the OK key glow
+ * flame-orange while pressed, and the pinhole LED blinks on every key. */
+
+.remote {
+  /* hardware palette */
+  --rm-body-hi: #35303b;
+  --rm-body: #221e27;
+  --rm-body-lo: #141117;
+  --rm-key-hi: #3e3845;
+  --rm-key: #2a2530;
+  --rm-key-lo: #1b171f;
+  --rm-ink: #ece5ee;
+  --rm-ink-dim: #8f8594;
+  --rm-flame: #ff7a1a;
+  --rm-flame-hi: #ffb15c;
+
+  grid-area: remote;
+  align-self: center;
+  justify-self: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: var(--remote-w);
+  padding: 22px 16px 16px;
+  border-radius: 84px 84px 52px 52px / 70px 70px 48px 48px;
+  background:
+    radial-gradient(90% 40% at 28% 6%, rgb(255 255 255 / 0.09), transparent 70%),
+    radial-gradient(60% 30% at 80% 100%, rgb(255 255 255 / 0.03), transparent 70%),
+    linear-gradient(180deg, var(--rm-body-hi) 0%, var(--rm-body) 22%, var(--rm-body-lo) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 0 0 1px rgb(0 0 0 / 0.55),
+    inset 1px 0 0 rgb(255 255 255 / 0.04),
+    inset -1px 0 0 rgb(255 255 255 / 0.03),
+    0 2px 0 rgb(255 255 255 / 0.03),
+    0 34px 46px -26px rgb(0 0 0 / 0.75),
+    0 10px 18px -10px rgb(0 0 0 / 0.5);
+  color: var(--rm-ink);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.remote.is-disabled > :not(.remote-brand):not(.remote-hold):not(.remote-ir) {
+  opacity: 0.4;
+}
+
+/* the infrared window at the tip */
+.remote-ir {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 46px;
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0a080c, #1d1821);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.8), 0 1px 0 rgb(255 255 255 / 0.06);
+  transform: translateX(-50%);
+}
+
+.remote-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 4px 8px 0;
+}
+
+/* pinhole LED: blinks orange on every key, red on an error */
+.remote-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0d0b0f;
+  box-shadow: inset 0 1px 1px rgb(0 0 0 / 0.9), 0 1px 0 rgb(255 255 255 / 0.06);
+  transition: background 60ms linear, box-shadow 60ms linear;
+}
+
+.remote-led.is-on {
+  background: var(--rm-flame-hi);
+  box-shadow: 0 0 6px 1px var(--rm-flame), 0 0 14px var(--rm-flame);
+}
+
+.remote-led.is-error {
+  background: #ff5a5a;
+  box-shadow: 0 0 6px 1px #ff3b3b;
+}
+
+/* raised round keys */
+.rbtn,
+.vol-key {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: var(--rm-ink);
+  transition: transform 60ms linear, box-shadow 60ms linear, background 120ms var(--ease), color 120ms var(--ease);
+}
+
+.rbtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, var(--rm-key-hi), var(--rm-key) 62%, var(--rm-key-lo));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -2px 3px rgb(0 0 0 / 0.35),
+    0 2px 0 #0b090d,
+    0 4px 8px rgb(0 0 0 / 0.45);
+}
+
+.rbtn .icon,
+.vol-key .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.rbtn:hover:not(:disabled),
+.vol-key:hover:not(:disabled) {
+  color: #fff;
+}
+
+.rbtn:hover:not(:disabled) {
+  background: radial-gradient(circle at 50% 30%, #4a4351, #302a37 62%, var(--rm-key-lo));
+}
+
+.rbtn.is-pressed,
+.rbtn:active:not(:disabled) {
+  transform: translateY(2px);
+  background: radial-gradient(circle at 50% 60%, var(--rm-key), var(--rm-key-lo));
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.6),
+    0 0 0 #0b090d,
+    0 0 0 2px rgb(255 122 26 / 0.35),
+    0 0 14px rgb(255 122 26 / 0.35);
+  color: var(--rm-flame-hi);
+}
+
+.rbtn:focus-visible,
+.vol-key:focus-visible,
+.dpad-ok:focus-visible {
+  outline: 2px solid var(--rm-flame-hi);
+  outline-offset: 3px;
+}
+
+.rbtn-sm {
+  width: 32px;
+  height: 32px;
+}
+
+.rbtn-sm .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.rbtn-power .icon {
+  color: #ff6b5e;
+}
+
+/* the voice/search key wears the flame */
+.rbtn-voice {
+  width: 36px;
+  height: 36px;
+  background: radial-gradient(circle at 50% 28%, #ffc45e, #ff8a1f 55%, #e2471c);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -2px 3px rgb(120 20 0 / 0.35),
+    0 2px 0 #5a1906,
+    0 4px 10px rgb(255 100 30 / 0.35);
+  color: #2a0d00;
+}
+
+.rbtn-voice:hover:not(:disabled) {
+  background: radial-gradient(circle at 50% 28%, #ffd27d, #ff9733 55%, #ea521f);
+  color: #2a0d00;
+}
+
+.rbtn-voice.is-pressed,
+.rbtn-voice:active:not(:disabled) {
+  background: radial-gradient(circle at 50% 60%, #ff8a1f, #d23f16);
+  box-shadow: inset 0 2px 4px rgb(90 20 0 / 0.55), 0 0 16px rgb(255 122 26 / 0.55);
+  color: #2a0d00;
+}
+
+.remote-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 4px;
+}
+
+/* D-pad: a raised ring around a concave OK key */
+.dpad {
+  position: relative;
+  width: 132px;
+  height: 132px;
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 37%, rgb(0 0 0 / 0.35) 37.5% 39%, transparent 40%),
+    radial-gradient(circle at 50% 22%, #433c4a, #2c2633 55%, #1d1922);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.13),
+    inset 0 -3px 6px rgb(0 0 0 / 0.4),
+    0 2px 0 #0b090d,
+    0 8px 16px -4px rgb(0 0 0 / 0.55);
+  transition: box-shadow 120ms var(--ease);
+}
+
+.dpad:has(.is-pressed),
+.dpad:has(:active:not(:disabled)) {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.13),
+    inset 0 -3px 6px rgb(0 0 0 / 0.4),
+    0 0 0 2px rgb(255 122 26 / 0.3),
+    0 0 18px rgb(255 122 26 / 0.3),
+    0 8px 16px -4px rgb(0 0 0 / 0.55);
+}
+
+.dpad-seg {
+  --gx: 50%;
+  --gy: 0%;
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--rm-ink-dim);
+  transition: background 90ms linear, color 90ms linear;
+}
+
+.dpad-up { clip-path: polygon(50% 50%, 0 0, 100% 0); }
+.dpad-right { --gx: 100%; --gy: 50%; clip-path: polygon(50% 50%, 100% 0, 100% 100%); }
+.dpad-down { --gx: 50%; --gy: 100%; clip-path: polygon(50% 50%, 100% 100%, 0 100%); }
+.dpad-left { --gx: 0%; --gy: 50%; clip-path: polygon(50% 50%, 0 100%, 0 0); }
+
+.dpad-seg:hover:not(:disabled) {
+  background: radial-gradient(circle at var(--gx) var(--gy), rgb(255 255 255 / 0.09), transparent 60%);
+  color: #fff;
+}
+
+.dpad-seg.is-pressed,
+.dpad-seg:active:not(:disabled) {
+  background: radial-gradient(circle at var(--gx) var(--gy), rgb(255 122 26 / 0.5), rgb(0 0 0 / 0.2) 64%);
+  color: var(--rm-flame-hi);
+}
+
+.dpad-seg:focus-visible {
+  outline: none;
+  background: radial-gradient(circle at var(--gx) var(--gy), rgb(255 177 92 / 0.3), transparent 64%);
+  color: var(--rm-flame-hi);
+}
+
+/* small engraved arrows on the ring */
+.chev {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+}
+
+.dpad-up .chev { left: calc(50% - 5px); top: 10px; border-bottom: 6px solid currentColor; border-top-width: 0; }
+.dpad-down .chev { left: calc(50% - 5px); bottom: 10px; border-top: 6px solid currentColor; border-bottom-width: 0; }
+.dpad-left .chev { top: calc(50% - 5px); left: 10px; border-right: 6px solid currentColor; border-left-width: 0; }
+.dpad-right .chev { top: calc(50% - 5px); right: 10px; border-left: 6px solid currentColor; border-right-width: 0; }
+
+.dpad-ok {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 75%, #3a3441, #25202b 60%, #1a161e);
+  box-shadow:
+    inset 0 2px 5px rgb(0 0 0 / 0.55),
+    inset 0 -1px 0 rgb(255 255 255 / 0.08),
+    0 1px 0 rgb(255 255 255 / 0.06);
+  color: var(--rm-ink-dim);
+  font: 700 12px / 1 var(--font-ui);
+  letter-spacing: 0.08em;
+  transform: translate(-50%, -50%);
+  transition: transform 60ms linear, background 120ms var(--ease), color 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+
+.dpad-ok:hover:not(:disabled) {
+  color: #fff;
+}
+
+.dpad-ok.is-pressed,
+.dpad-ok:active:not(:disabled) {
+  background: radial-gradient(circle at 50% 55%, #ff9a3d, #ff6a14 60%, #d9420f);
+  box-shadow:
+    inset 0 2px 5px rgb(110 25 0 / 0.5),
+    0 0 18px rgb(255 122 26 / 0.6);
+  color: #2a0d00;
+  transform: translate(-50%, calc(-50% + 1px)) scale(0.97);
+}
+
+/* volume: one rocker with mute in the middle */
+.vol-rocker {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr;
+  align-items: stretch;
+  width: 100%;
+  height: 36px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, var(--rm-key-hi), var(--rm-key) 55%, var(--rm-key-lo));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    inset 0 -2px 3px rgb(0 0 0 / 0.35),
+    0 2px 0 #0b090d,
+    0 4px 8px rgb(0 0 0 / 0.45);
+}
+
+.vol-key {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.vol-key:first-child { border-radius: 18px 0 0 18px; }
+.vol-key:last-child { border-radius: 0 18px 18px 0; }
+
+.vol-key + .vol-key {
+  box-shadow: inset 1px 0 0 rgb(0 0 0 / 0.45), inset 2px 0 0 rgb(255 255 255 / 0.05);
+}
+
+.vol-mute .icon {
+  width: 15px;
+  height: 15px;
+  color: var(--rm-ink-dim);
+}
+
+.vol-key.is-pressed,
+.vol-key:active:not(:disabled) {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.35), rgb(255 122 26 / 0.18));
+  color: var(--rm-flame-hi);
+}
+
+.vol-key.is-pressed .icon,
+.vol-key:active:not(:disabled) .icon {
+  color: var(--rm-flame-hi);
+}
+
+/* press-and-hold feedback */
+.is-holding {
+  animation: hold-glow 700ms ease-in-out infinite alternate;
+}
+
+@keyframes hold-glow {
+  from { filter: drop-shadow(0 0 0 rgb(255 122 26 / 0)); }
+  to { filter: drop-shadow(0 0 7px rgb(255 122 26 / 0.9)); }
+}
+
+.remote-brand {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  color: #5b5260;
+  font: 600 11px / 1 var(--font-ui);
+  letter-spacing: 0.16em;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.05);
+  text-transform: lowercase;
+}
+
+.remote-brand img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.9;
+  filter: saturate(0.9);
+}
+
+.remote-brand b {
+  font-weight: 800;
+  color: #8a6d63;
+}
+
+.remote-hold {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 16px;
+  color: var(--rm-flame-hi);
+  font: 650 9px / 11px var(--font-ui);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.remote-hold.is-active {
+  opacity: 1;
+}
+
+.remote.is-holding-any .remote-brand {
+  opacity: 0;
+}
+
+/* remote tooltips go to the left of the button */
+.remote [data-tip]::after {
+  right: calc(100% + 8px);
+}
+
+.dpad [data-tip]::after {
+  display: none;
+}
+
+.dpad-tip {
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  z-index: 30;
+  padding: 6px 9px;
+  border-radius: var(--r-xs);
+  background: #120e15;
+  color: #f6eff4;
+  box-shadow: var(--shadow-2);
+  font: 500 var(--fs-xs) / 1 var(--font-ui);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(-50%);
+}

@@ -1,0 +1,293 @@
+/* Firefly Lake: a 16:9 TV layout. Sizes follow the viewport width, so a
+   960x540 Fire TV WebView and a 1920x1080 browser look the same. Everything
+   stays inside a 5% safe area for TVs that overscan. */
+:root {
+  --u: calc(100vw / 60); /* 16 px at 960 wide, 32 px at 1920 */
+  --safe-x: 5vw;
+  --safe-y: 5vh;
+  --ink: #fff4ec;
+  --dim: rgba(255, 244, 236, 0.72);
+  --peach: #ffb38a;
+  --pink: #ff7b9c;
+  --gold: #ffd36b;
+  --panel: rgba(28, 18, 52, 0.62);
+  --edge: rgba(255, 210, 190, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #1c1440;
+  color: var(--ink);
+  font: 400 var(--u) / 1.35 system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  cursor: none;
+  user-select: none;
+}
+
+#stage,
+#stage canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: block;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.center {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--u) * 1.2);
+  color: var(--dim);
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.1em 0.45em;
+  margin: 0 0.12em;
+  border-radius: 0.4em;
+  border: 1px solid var(--edge);
+  background: rgba(255, 255, 255, 0.08);
+  font: inherit;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+code {
+  font-family: ui-monospace, Menlo, Consolas, 'Droid Sans Mono', monospace;
+  font-size: 0.92em;
+  color: var(--gold);
+}
+
+/* ---------- HUD ---------- */
+#hud {
+  position: fixed;
+  top: var(--safe-y);
+  left: var(--safe-x);
+  display: flex;
+  gap: calc(var(--u) * 1.2);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  padding: 0.4em 0.9em;
+  border-radius: 0.7em;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  min-width: 6em;
+}
+
+.stat .label {
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.stat span:last-child {
+  font-size: 1.6em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse {
+  animation: pulse 0.35s ease-out;
+}
+
+@keyframes pulse {
+  from {
+    color: var(--gold);
+    transform: scale(1.25);
+  }
+}
+
+/* Sits one row above the centred key legend, so the two never overlap on a
+   960x540 TV page. */
+#badge {
+  position: fixed;
+  left: var(--safe-x);
+  bottom: calc(var(--safe-y) + 2.6em);
+  display: flex;
+  gap: 0.5em;
+  font-size: 0.75em;
+}
+
+#badge span {
+  padding: 0.25em 0.7em;
+  border-radius: 1em;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  color: var(--dim);
+}
+
+#badge #badge-tier {
+  color: var(--gold);
+}
+
+#badge #badge-busy {
+  color: #fff;
+  background: rgba(255, 92, 138, 0.55);
+}
+
+/* ---------- screens ---------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--safe-y) var(--safe-x);
+  background: radial-gradient(ellipse at 50% 55%, rgba(20, 10, 40, 0.35), rgba(20, 10, 40, 0.7));
+}
+
+#title {
+  background: linear-gradient(180deg, rgba(20, 10, 40, 0.15) 0%, rgba(20, 10, 40, 0) 40%, rgba(20, 10, 40, 0.55) 100%);
+  justify-content: flex-start;
+  padding-top: 12vh;
+}
+
+h1 {
+  margin: 0;
+  font-size: calc(var(--u) * 4.4);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(180deg, #fff6e8 20%, var(--peach) 70%, var(--pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0.08em 0.25em rgba(255, 120, 140, 0.45));
+}
+
+h2 {
+  margin: 0 0 0.6em;
+  font-size: calc(var(--u) * 2.2);
+  font-weight: 700;
+}
+
+.sub {
+  margin: 0.2em 0 0;
+  color: var(--dim);
+  font-size: 1.1em;
+}
+
+.cta {
+  margin: 1.6em 0 0;
+  font-size: 1.25em;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.best {
+  margin: 0.4em 0 0;
+  color: var(--dim);
+  font-size: 0.9em;
+}
+
+.keys {
+  position: absolute;
+  bottom: var(--safe-y);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4em 1.4em;
+  margin: 0;
+  padding: 0 var(--safe-x);
+  list-style: none;
+  color: var(--dim);
+  font-size: 0.85em;
+}
+
+#menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.6em;
+  min-width: 22em;
+  border-radius: 1em;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+}
+
+#menu-list li {
+  padding: 0.55em 1em;
+  border-radius: 0.6em;
+  text-align: left;
+  font-size: 1.1em;
+}
+
+#menu-list li.focused {
+  background: linear-gradient(90deg, rgba(255, 123, 156, 0.85), rgba(255, 179, 138, 0.85));
+  color: #24123a;
+  font-weight: 700;
+}
+
+#menu-list li.cycle.focused::before {
+  content: '◀ ';
+}
+
+#menu-list li.cycle.focused::after {
+  content: ' ▶';
+}
+
+.hint {
+  margin-top: 1.2em;
+  color: var(--dim);
+  font-size: 0.8em;
+}
+
+.score {
+  font-size: 1.3em;
+}
+
+.score strong {
+  color: var(--gold);
+}
+
+#nogl p {
+  max-width: 34em;
+}
+
+/* ---------- toast ---------- */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--safe-y) + 2.6em);
+  transform: translate(-50%, 1em);
+  max-width: 80vw;
+  padding: 0.55em 1.1em;
+  border-radius: 0.8em;
+  background: rgba(20, 12, 40, 0.85);
+  border: 1px solid var(--edge);
+  font-size: 0.9em;
+  opacity: 0;
+  transition:
+    opacity 0.25s,
+    transform 0.25s;
+  pointer-events: none;
+}
+
+#toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}

@@ -1,0 +1,29 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792137890754,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [],
+ "expect": {
+  "oracle": "health",
+  "signature": "js-error:Failed to load resource: the server responded with a status of # (Not Found)@favicon.ico:0"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ }
+}

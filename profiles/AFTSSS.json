@@ -1,0 +1,76 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "model": "AFTSSS",
+  "name": "Fire TV Stick (3rd gen)",
+  "source": "manual",
+  "capturedAt": "2026-10-09",
+  "firelabVersion": "0.1.0",
+  "os": {
+    "fireOs": { "value": "7.7.1.7", "source": "measured", "note": "getprop, 2026-10-08" },
+    "android": { "value": "9", "source": "measured", "note": "getprop" },
+    "sdk": { "value": 28, "source": "measured", "note": "getprop" },
+    "build": { "value": "PS7717/5741", "source": "measured", "note": "getprop" }
+  },
+  "cpu": {
+    "abis": { "value": ["armeabi-v7a", "armeabi"], "source": "measured", "note": "ro.product.cpu.abilist: 32-bit ARM only, no arm64" },
+    "soc": { "value": "MT8695", "source": "measured", "note": "MediaTek, recorded in the 2026-10-08 getprop session" },
+    "cores": { "value": 4, "source": "spec", "note": "quad-core" },
+    "maxGHz": { "value": 1.69, "source": "measured", "note": "cores already sit at their 1.69 GHz maximum under load" }
+  },
+  "memory": {
+    "totalMB": { "value": 900.7, "source": "measured", "note": "MemTotal 922272 kB" },
+    "availIdleMB": { "value": null, "source": "unknown" },
+    "availWebViewMB": { "value": null, "source": "unknown" },
+    "knownGoodMB": { "value": 415, "source": "measured", "note": "Sunset Villa: app 210 MB + WebView renderer 205 MB PSS while exploring" },
+    "lowestAvailMB": { "value": 83, "source": "measured", "note": "MemAvailable never went below 83-93 MB during that run" },
+    "appBudgetMB": { "value": 415, "source": "measured", "note": "known good 415 MB with MemAvailable >= 83 MB" },
+    "appLimitMB": { "value": 458, "source": "estimated", "note": "known good 415 MB + 83 MB available - 40 MB floor" },
+    "lowRam": { "value": null, "source": "unknown" }
+  },
+  "gpu": {
+    "renderer": { "value": "PowerVR Rogue GE8300", "source": "measured", "note": "WebGL UNMASKED_RENDERER" },
+    "vendor": { "value": null, "source": "unknown" },
+    "speedFactor": { "value": 1, "source": "measured", "note": "the baseline of the speed table" }
+  },
+  "webgl": {
+    "webgl1": { "value": true, "source": "estimated", "note": "implied by WebGL2" },
+    "webgl2": { "value": true, "source": "measured", "note": "Sunset Villa (three.js, WebGL2 only) runs" },
+    "maxTextureSize": { "value": null, "source": "unknown" },
+    "maxRenderbufferSize": { "value": null, "source": "unknown" },
+    "extensions": { "value": null, "source": "unknown" },
+    "compressed": { "value": null, "source": "unknown" },
+    "floatRender": { "value": null, "source": "unknown" },
+    "mediumpFp16": { "value": true, "source": "measured", "note": "mediump is a real 16-bit float: shaders that relied on more precision showed artifacts" }
+  },
+  "webview": {
+    "version": { "value": "138.0.7204 (amazon-webview-v138-7204-tv)", "source": "measured", "note": "Amazon WebView Chromium 138" },
+    "major": { "value": 138, "source": "measured" },
+    "package": { "value": "com.amazon.webview.chromium", "source": "measured" }
+  },
+  "media": {
+    "decoders": { "value": null, "source": "unknown", "note": "not captured yet: fit uses the estimated table for this model" },
+    "streamOkMbps": { "value": 4.5, "source": "measured", "note": "H.264 High at 2.5-4.5 Mbps over Wi-Fi played without stalls" },
+    "streamStallMbps": { "value": 6.7, "source": "measured", "note": "6.7 Mbps H.264 stalled over Wi-Fi" }
+  },
+  "display": {
+    "width": { "value": 1920, "source": "spec", "note": "1080p output" },
+    "height": { "value": 1080, "source": "spec", "note": "1080p output" },
+    "density": { "value": null, "source": "unknown" }
+  },
+  "references": [
+    { "app": "Sunset Villa (three.js)", "scene": "explore, standing", "tier": "tv", "resolution": "768x432", "fps": 27, "drawCalls": 175, "triangles": 250000, "date": "2026-10-09" },
+    { "app": "Sunset Villa (three.js)", "scene": "explore, walking", "tier": "tv", "resolution": "768x432", "fps": 24, "date": "2026-10-09" },
+    { "app": "Sunset Villa (three.js)", "scene": "standing and walking", "tier": "tv-hd", "fps": [13, 17], "note": "sun shadows on: unplayable, so this stick stays on tv", "date": "2026-10-09" },
+    { "app": "Sunset Villa (three.js)", "scene": "exploring", "fps": [24, 29], "appPssMB": 210, "rendererPssMB": 205, "memAvailableMB": [83, 93], "note": "CPU-bound", "date": "2026-10-08" }
+  ],
+  "notes": [
+    "mediump is real FP16: precision artifacts in shaders that assume more.",
+    "MSAA costs 15-25% of the frame rate.",
+    "Image-based lighting (IBL) was the costliest per-pixel feature; a point light cost about 13%.",
+    "CPU-bound in heavy scenes and fill-bound at full resolution; a render scale below 80% bought nothing in heavy scenes.",
+    "The CPU already runs at its 1.69 GHz maximum; the GPU clock can't be read or changed without root.",
+    "Amazon WebView 138 drops keepalive fetches after about 11 per page.",
+    "Video stalled at 6.7 Mbps H.264 over Wi-Fi; 2.5-4.5 Mbps H.264 High played fine."
+  ]
+}

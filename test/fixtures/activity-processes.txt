@@ -1,0 +1,12 @@
+  *APP* UID 10226 ProcessRecord{a0ffa76 19349:com.amazon.webview.chromium:webview_service/u0a226}
+  *APP* UID 10118 ProcessRecord{600f66a 3516:com.amazon.alexamediaplayer.runtime.ftv/u0a118}
+  *APP* UID 99001 ProcessRecord{e724841 13181:com.amazon.webview.chromium:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a263i1}
+  *APP* UID 10197 ProcessRecord{7e56c44 1584:com.amazon.tv.ime/u0a197}
+  *APP* UID 10212 ProcessRecord{c213037 4868:com.amazon.venezia/u0a212}
+  *PERS* UID 10214 ProcessRecord{fffe7f5 1965:com.amazon.vizzini/u0a214}
+  *APP* UID 10083 ProcessRecord{472284e 4669:com.amazon.connectivitycontroller/u0a83}
+  *APP* UID 10125 ProcessRecord{65cd036 7392:com.amazon.bueller.photos/u0a125}
+  *APP* UID 10126 ProcessRecord{9e2117d 2378:com.amazon.ceviche/u0a126}
+  *APP* UID 10093 ProcessRecord{6e91465 16543:com.android.providers.downloads/u0a93}
+  *APP* UID 10226 ProcessRecord{1d68be0 7924:com.amazon.webview.chromium:AWVMetricsProcess/u0a226}
+  *APP* UID 10054 ProcessRecord{2961a0b 1944:com.mediatek.tvinput/u0a54}

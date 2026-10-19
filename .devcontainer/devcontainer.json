@@ -1,0 +1,14 @@
+{
+  "name": "FireLab (try it, no Fire TV needed)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm ci && npm run build",
+  "postAttachCommand": "echo 'Try: npm run demo   (the game-testing engine on a simulated TV game)  |  npm run demo:dashboard   (the dashboard with a simulated TV, port 7310)'",
+  "forwardPorts": [7310],
+  "portsAttributes": { "7310": { "label": "FireLab dashboard (demo)", "onAutoForward": "openBrowser" } },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.live-server"],
+      "settings": { "livePreview.defaultPreviewPath": "/docs/sample-run/report.html" }
+    }
+  }
+}

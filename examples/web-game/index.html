@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>Firefly Lake · FireLab demo</title>
+    <meta name="description" content="A small three.js game for Fire TV and Android TV that uses @firelab/perf for tier detection, adaptive resolution, an on-screen meter and the window.firelab hook." />
+    <link rel="stylesheet" href="style.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+          "@firelab/perf": "../../packages/perf/index.js"
+        }
+      }
+    </script>
+    <script type="module" src="game.js"></script>
+  </head>
+  <body>
+    <div id="stage"></div>
+
+    <div id="loading" class="center">Loading Firefly Lake…</div>
+
+    <header id="hud" hidden>
+      <div class="stat"><span class="label">Score</span><span id="hud-score">0</span></div>
+      <div class="stat"><span class="label">Lanterns</span><span id="hud-lanterns">0</span></div>
+    </header>
+
+    <aside id="badge">
+      <span id="badge-tier">tv · auto</span>
+      <span id="badge-gpu"></span>
+      <span id="badge-busy" hidden>busy scene</span>
+    </aside>
+
+    <section id="title" class="screen" hidden>
+      <h1>Firefly Lake</h1>
+      <p class="sub">A FireLab demo for <code>@firelab/perf</code></p>
+      <p class="cta">Press <kbd>OK</kbd> to sail</p>
+      <p class="best">Best <span id="best">0</span></p>
+      <ul class="keys">
+        <li><kbd>◀</kbd><kbd>▶</kbd> steer</li>
+        <li><kbd>OK</kbd> jump</li>
+        <li><kbd>☰</kbd> menu</li>
+        <li><kbd>⏩</kbd> busy scene</li>
+        <li><kbd>⏪</kbd><kbd>⏪</kbd> perf meter</li>
+      </ul>
+    </section>
+
+    <section id="menu" class="screen" hidden>
+      <h2>Paused</h2>
+      <ul id="menu-list"></ul>
+      <p class="hint"><kbd>▲</kbd><kbd>▼</kbd> choose · <kbd>OK</kbd> select · <kbd>◀</kbd><kbd>▶</kbd> change quality · <kbd>Back</kbd> resume</p>
+    </section>
+
+    <section id="over" class="screen" hidden>
+      <h2>Your boat hit a rock</h2>
+      <p class="score">Score <strong id="over-score">0</strong> · Best <strong id="over-best">0</strong></p>
+      <p class="cta"><kbd>OK</kbd> sail again · <kbd>Back</kbd> title</p>
+    </section>
+
+    <section id="nogl" class="screen" hidden>
+      <h2>This device has no WebGL2</h2>
+      <p>Firefly Lake needs WebGL2, which <span id="nogl-gpu">this GPU</span> does not offer (2014–2018 sticks with a Mali-450 are like this).</p>
+      <p class="hint"><code>window.firelab</code> still reports the device, so FireLab can tell you why.</p>
+    </section>
+
+    <div id="toast" role="status"></div>
+  </body>
+</html>

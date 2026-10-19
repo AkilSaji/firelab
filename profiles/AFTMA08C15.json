@@ -1,0 +1,63 @@
+{
+  "$schema": "./schema.json",
+  "schemaVersion": 1,
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "source": "manual",
+  "capturedAt": "2026-10-15",
+  "firelabVersion": "0.1.0",
+  "os": {
+    "fireOs": { "value": "8.1.8.2", "source": "measured", "note": "getprop (test/fixtures/getprop-AFTMA08C15.txt, recorded from the device)" },
+    "android": { "value": "11", "source": "measured", "note": "getprop" },
+    "sdk": { "value": 30, "source": "measured", "note": "getprop" },
+    "build": { "value": "RS8182/3811", "source": "measured", "note": "getprop" }
+  },
+  "cpu": {
+    "abis": { "value": ["armeabi-v7a", "armeabi"], "source": "measured", "note": "ro.product.cpu.abilist; abilist64 is empty: 32-bit userspace" },
+    "soc": { "value": "mt8696", "source": "measured", "note": "ro.board.platform" },
+    "cores": { "value": null, "source": "unknown" },
+    "maxGHz": { "value": null, "source": "unknown" }
+  },
+  "memory": {
+    "totalMB": { "value": 1670, "source": "measured", "note": "MemTotal 1710032 kB" },
+    "availIdleMB": { "value": null, "source": "unknown" },
+    "availWebViewMB": { "value": null, "source": "unknown" },
+    "knownGoodMB": { "value": 561, "source": "measured", "note": "Sunset Villa: app 270-295 MB + renderer 210-266 MB PSS (the upper ends; they may not have peaked together)" },
+    "lowestAvailMB": { "value": 360, "source": "measured", "note": "MemAvailable stayed at 360-390 MB" },
+    "appBudgetMB": { "value": 821, "source": "estimated", "note": "known good 561 MB + (360 MB available - 100 MB reserve)" },
+    "appLimitMB": { "value": 881, "source": "estimated", "note": "known good 561 MB + 360 MB available - 40 MB floor" }
+  },
+  "gpu": {
+    "renderer": { "value": "PowerVR Rogue GE9215", "source": "measured", "note": "WebGL UNMASKED_RENDERER" },
+    "vendor": { "value": null, "source": "unknown" },
+    "speedFactor": { "value": 2.2, "source": "measured", "note": "2-2.3x the GE8300 on Sunset Villa (tv-hd at up to 1080p, 25-30 fps walking, vs tv at 768x432, 24-27 fps)" }
+  },
+  "webgl": {
+    "webgl1": { "value": true, "source": "estimated", "note": "implied by WebGL2" },
+    "webgl2": { "value": true, "source": "measured", "note": "Sunset Villa (three.js, WebGL2 only) runs" },
+    "maxTextureSize": { "value": null, "source": "unknown" },
+    "maxRenderbufferSize": { "value": null, "source": "unknown" },
+    "extensions": { "value": null, "source": "unknown" },
+    "compressed": { "value": null, "source": "unknown" }
+  },
+  "webview": {
+    "version": { "value": null, "source": "unknown" },
+    "major": { "value": null, "source": "unknown" }
+  },
+  "media": {
+    "decoders": { "value": null, "source": "unknown", "note": "not captured yet: fit uses the estimated table for this model" }
+  },
+  "display": {
+    "width": { "value": 1920, "source": "measured", "note": "wm size" },
+    "height": { "value": 1080, "source": "measured", "note": "wm size" },
+    "density": { "value": 320, "source": "measured", "note": "wm density" }
+  },
+  "references": [
+    { "app": "Sunset Villa (three.js)", "scene": "walking", "tier": "tv-hd", "resolution": "up to 1920x1080", "fps": [25, 30], "appPssMB": [270, 295], "rendererPssMB": [210, 266], "memAvailableMB": [360, 390], "date": "2026-10-15" },
+    { "app": "Sunset Villa (three.js)", "scene": "crowded scenes", "tier": "tv-hd", "resolution": "up to 1920x1080", "fps": [20, 25], "date": "2026-10-15" }
+  ],
+  "notes": [
+    "Amazon's device specifications page lists AFTMA08C15 as the Fire TV Stick 4K Plus (the 4K Max 2nd gen is AFTKRT).",
+    "Everything marked unknown waits for a real `firelab profile` capture."
+  ]
+}

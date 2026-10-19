@@ -1,0 +1,57 @@
+# Example: test a Fire TV app on every push without a Fire TV.
+#
+# Copy this file into your app's repository as .github/workflows/firelab.yml
+# and replace "uses: ./action" with the published action, e.g.
+#
+#     uses: AkilSaji/firelab/action@v0
+#
+# For a native app, build the APK first and pass it as `apk:`:
+#
+#     - run: ./gradlew assembleDebug
+#     - uses: AkilSaji/firelab/action@v0
+#       with:
+#         apk: app/build/outputs/apk/debug/app-debug.apk
+#         profile: AFTSSS          # Fire TV Stick (3rd gen): 1 GB, Fire OS 7 (Android 9)
+#
+# For a web app, pass its URL as `url:` and FireLab wraps it into an APK.
+# Here it runs by hand (Actions > Example > Run workflow) on a public page.
+name: Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Web app to test
+        default: https://threejs.org/examples/webgl_animation_keyframes.html
+      profile:
+        description: Fire TV model to imitate
+        type: choice
+        options: [AFTSSS, AFTMA08C15, AFTKM, AFTKRT, AFTR]
+        default: AFTSSS
+
+permissions:
+  contents: read
+
+jobs:
+  firetv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # Inside the FireLab repo the action runs this checkout's build;
+      # elsewhere leave `command` out and it runs `npx firelab@latest`.
+      - run: npm ci && npm run build
+      - uses: ./action
+        with:
+          url: ${{ inputs.url }}
+          name: Example
+          profile: ${{ inputs.profile }}
+          command: node ${{ github.workspace }}/dist/cli.js
+          # "true" fails the job when the FireLab version has no `firelab explore`.
+          explore: auto
+          explore-minutes: '3'
+          explore-fail-on: crash,black,frozen,focus-trap

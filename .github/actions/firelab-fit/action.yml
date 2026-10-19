@@ -1,0 +1,95 @@
+name: FireLab fit
+description: >-
+  Re-scores a saved firelab-measurement.json against every Fire OS model (no
+  device needed), writes a Markdown summary to the job page and an HTML
+  report, and fails the job when the models you care about (default: the
+  1 GB Fire TV Sticks) won't run the app.
+author: the FireLab authors
+branding:
+  icon: tv
+  color: orange
+
+inputs:
+  measurement:
+    description: Path to the measurement written by `firelab fit` on a device.
+    default: firelab-measurement.json
+  fail-on:
+    description: 'Models that must not be ❌ (comma-separated model codes), "all", or "none".'
+    default: AFTSSS,AFTSS
+  strict:
+    description: Also fail on ⚠️ risky verdicts ("true" or "false").
+    default: 'false'
+  apk:
+    description: Optional APK for the static checks (CPU ABIs, minSdk, TV hardware in the manifest, Leanback).
+    default: ''
+  needs:
+    description: 'Optional web needs, e.g. "webgl2,astc,max-texture=4096".'
+    default: ''
+  media:
+    description: Optional MP4 files, folders or URLs to check (space-separated).
+    default: ''
+  profiles:
+    description: Optional folder of extra device profiles (they win over the bundled ones).
+    default: ''
+  report:
+    description: Where to write the HTML report.
+    default: firelab-fit.html
+  firelab-version:
+    description: The npm version of firelab to run.
+    default: latest
+  command:
+    description: 'Run this instead of "npx --yes firelab@<version>", e.g. "node dist/fit/main.js" inside the FireLab repo.'
+    default: ''
+  node-version:
+    description: Node.js version.
+    default: '22'
+
+outputs:
+  verdict:
+    description: '"pass", "fail" (a gated model is ❌, or ⚠️ with strict) or "error".'
+    value: ${{ steps.fit.outputs.verdict }}
+  report:
+    description: Path of the HTML report.
+    value: ${{ steps.fit.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+    - id: fit
+      shell: bash
+      # Inputs go through the environment, never into the script text.
+      env:
+        FIT_MEASUREMENT: ${{ inputs.measurement }}
+        FIT_FAIL_ON: ${{ inputs.fail-on }}
+        FIT_STRICT: ${{ inputs.strict }}
+        FIT_APK: ${{ inputs.apk }}
+        FIT_NEEDS: ${{ inputs.needs }}
+        FIT_MEDIA: ${{ inputs.media }}
+        FIT_PROFILES: ${{ inputs.profiles }}
+        FIT_REPORT: ${{ inputs.report }}
+        FIT_VERSION: ${{ inputs.firelab-version }}
+        FIT_COMMAND: ${{ inputs.command }}
+      run: |
+        set -uo pipefail
+        if [ -n "$FIT_COMMAND" ]; then read -ra cmd <<< "$FIT_COMMAND"; else cmd=(npx --yes "firelab@${FIT_VERSION}"); fi
+        args=(fit --offline "$FIT_MEASUREMENT" --fail-on "$FIT_FAIL_ON" --report "$FIT_REPORT" --summary "${GITHUB_STEP_SUMMARY:-/dev/null}")
+        if [ "$FIT_STRICT" = "true" ]; then args+=(--strict); fi
+        if [ -n "$FIT_APK" ]; then args+=(--apk "$FIT_APK"); fi
+        if [ -n "$FIT_NEEDS" ]; then args+=(--needs "$FIT_NEEDS"); fi
+        if [ -n "$FIT_PROFILES" ]; then args+=(--profiles "$FIT_PROFILES"); fi
+        if [ -n "$FIT_MEDIA" ]; then
+          read -ra media <<< "$FIT_MEDIA"
+          for m in "${media[@]}"; do args+=(--media "$m"); done
+        fi
+        "${cmd[@]}" "${args[@]}"
+        code=$?
+        echo "report=$FIT_REPORT" >> "${GITHUB_OUTPUT:-/dev/null}"
+        case $code in
+          0) echo "verdict=pass" >> "${GITHUB_OUTPUT:-/dev/null}" ;;
+          2) echo "verdict=fail" >> "${GITHUB_OUTPUT:-/dev/null}"; echo "::error title=FireLab fit::A gated Fire TV model won't run the app (see the job summary)." ;;
+          *) echo "verdict=error" >> "${GITHUB_OUTPUT:-/dev/null}" ;;
+        esac
+        exit $code

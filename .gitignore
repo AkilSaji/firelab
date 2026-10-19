@@ -1,0 +1,34 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+.env
+.env.*
+.firelab/
+*.tgz
+# Android build output (android-template)
+android-template/**/build/
+android-template/.gradle/
+*.apk
+!test/fixtures/**/*.apk
+
+# Local test reports
+reports/
+vega-check/
+
+# Native focus fixture build output
+examples/native-tv/out/
+
+# Local Claude Code settings
+.claude/
+
+# private hackathon notes, not for the public repo
+docs/SUBMISSION-DRAFT.md
+
+# Vercel project link for the landing page
+.vercel/
+site/.vercel/
+
+# Private hackathon research (competitor analysis, team brief)
+hackathon-brief/

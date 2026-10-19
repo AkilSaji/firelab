@@ -1,0 +1,17 @@
+Tasks: 289 total,   1 running, 288 sleeping,   0 stopped,   0 zombie
+  Mem:  1710032K total,  1618640K used,  93585408 free,  14721024 buffers
+ Swap:   819196K total,   714492K used,   104704K free,   323184K cached
+400%cpu 116%user   0%nice  47%sys 238%idle   0%iow   0%irq   0%sirq   0%host
+   PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS
+ 13181 u0_i9001     10 -10 2.7G 254M  76M S 65.6  15.1  41:36.03 com.amazon.webview.chromium:sandboxed_process0:org.chromium.content.app.San
+ 13059 u0_a263      10 -10 1.9G 137M  80M S 43.7   8.2  28:36.45 com.sunsetvilla.tv
+ 22523 shell        20   0 9.2M 3.6M 2.9M R 21.8   0.2   0:00.09 top -b -n 1 -m 12
+   390 audioserver  20   0  85M 7.6M 4.8M S 18.7   0.4  17:35.92 fireos.hardware.audio.service
+   424 system       -3  -8  70M  10M 7.9M S  9.3   0.6   8:16.31 surfaceflinger
+   420 audioserver  20   0  69M 7.2M 4.8M S  6.2   0.4   3:54.98 audioserver
+ 22054 root         20   0    0    0    0 I  3.1   0.0   0:00.43 [kworker/3:0-events_power_efficient]
+  3157 u0_a142      20   0 1.7G  85M  33M S  3.1   5.0   3:02.98 com.amazon.firebat
+   935 root         10 -10    0    0    0 S  3.1   0.0   1:07.99 [hif_thread]
+ 22307 root         20   0    0    0    0 I  0.0   0.0   0:00.11 [kworker/2:2-mm_percpu_wq]
+ 22228 root         20   0    0    0    0 I  0.0   0.0   0:00.35 [kworker/u8:1-pvr_misr]
+ 22212 root         20   0    0    0    0 I  0.0   0.0   0:00.12 [kworker/1:2-events]

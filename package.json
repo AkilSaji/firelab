@@ -1,0 +1,77 @@
+{
+  "name": "firelab",
+  "version": "0.1.0",
+  "description": "Test and tune apps and games on real Fire TV and Android TV devices: an MCP server for AI agents, a CLI and a live dashboard, plus a WebView performance sweep.",
+  "license": "MIT",
+  "author": "the FireLab authors",
+  "type": "module",
+  "bin": {
+    "firelab": "dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "ui",
+    "!ui/dev",
+    "knowledge",
+    "profiles",
+    "android-template",
+    "README.md",
+    "LICENSE"
+  ],
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run && npm test --workspace packages/perf",
+    "test:watch": "vitest",
+    "test:all": "vitest run && npm test --workspaces --if-present",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run build && npm test",
+    "device:check": "npm run build && node scripts/device-check.mjs",
+    "vega:check": "npm run build && node scripts/vega-check.mjs",
+    "docs:tools": "npm run build && node scripts/gen-tools-doc.mjs",
+    "demo": "npm run build --silent && node dist/cli.js demo",
+    "demo:dashboard": "node ui/dev/mock-server.mjs"
+  },
+  "keywords": [
+    "fire-tv",
+    "firetv",
+    "fire-os",
+    "android-tv",
+    "adb",
+    "mcp",
+    "model-context-protocol",
+    "webview",
+    "devtools",
+    "performance",
+    "testing",
+    "webgl",
+    "games"
+  ],
+  "dependencies": {
+    "@firelab/perf": "^0.1.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "jpeg-js": "^0.4.4",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.0"
+  }
+}

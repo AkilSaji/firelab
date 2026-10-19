@@ -1,0 +1,483 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792138096068,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [
+  {
+   "i": 0,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 0,
+   "stateId": "a2f8b8b6b76b",
+   "frameHash": "e070b2e0cad0e2e0"
+  },
+  {
+   "i": 1,
+   "action": {
+    "kind": "key",
+    "key": "playpause"
+   },
+   "gapMs": 4761,
+   "stateId": "8c357d491b95",
+   "frameHash": "62f8b0e0c0d0e0e0"
+  },
+  {
+   "i": 2,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 4033,
+   "stateId": "8c357d491b95",
+   "frameHash": "6370f0e8e4c41f67"
+  },
+  {
+   "i": 3,
+   "action": {
+    "kind": "key",
+    "key": "ok"
+   },
+   "gapMs": 2575,
+   "stateId": "4f36480af2e2",
+   "frameHash": "637a70e8c8c560a0"
+  },
+  {
+   "i": 4,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 3757,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560a0"
+  },
+  {
+   "i": 5,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4182,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560a0"
+  },
+  {
+   "i": 6,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 3519,
+   "stateId": "fd4369fb80ca",
+   "frameHash": "e070f0e0ca84e0e0"
+  },
+  {
+   "i": 7,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 3463,
+   "stateId": "af78311d0339",
+   "frameHash": "e070f0fcca84e0e0"
+  },
+  {
+   "i": 8,
+   "action": {
+    "kind": "key",
+    "key": "ok"
+   },
+   "gapMs": 3344,
+   "stateId": "af78311d0339",
+   "frameHash": "e070f0fcca84e0c0"
+  },
+  {
+   "i": 9,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 2662,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560e0"
+  },
+  {
+   "i": 10,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 2328,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560e0"
+  },
+  {
+   "i": 11,
+   "action": {
+    "kind": "key",
+    "key": "ok"
+   },
+   "gapMs": 2904,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560e0"
+  },
+  {
+   "i": 12,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2428,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560e0"
+  },
+  {
+   "i": 13,
+   "action": {
+    "kind": "key",
+    "key": "back"
+   },
+   "gapMs": 2406,
+   "stateId": "fd4369fb80ca",
+   "frameHash": "e070f0e0ca84e0e0"
+  },
+  {
+   "i": 14,
+   "action": {
+    "kind": "key",
+    "key": "playpause"
+   },
+   "gapMs": 2423,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560e0"
+  },
+  {
+   "i": 15,
+   "action": {
+    "kind": "key",
+    "key": "playpause"
+   },
+   "gapMs": 2363,
+   "stateId": "fd4369fb80ca",
+   "frameHash": "e070f0e0ca84e0e0"
+  },
+  {
+   "i": 16,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 2757,
+   "stateId": "fd4369fb80ca",
+   "frameHash": "e070f0e0ca84e0e0"
+  },
+  {
+   "i": 17,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 2547,
+   "stateId": "fd4369fb80ca",
+   "frameHash": "e070f0e0ca84e0e0"
+  },
+  {
+   "i": 18,
+   "action": {
+    "kind": "key",
+    "key": "back"
+   },
+   "gapMs": 2463,
+   "stateId": "EXIT",
+   "frameHash": "81f385e58d8cd5f0"
+  }
+ ],
+ "expect": {
+  "oracle": "health",
+  "signature": "unexpected-exit:fd4369fb80ca:back"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ },
+ "startStateId": "64b2c3752602",
+ "shortcuts": [
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "ok"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2463,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "ok"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 2547,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 6,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2463,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "ok"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "left"
+    },
+    "gapMs": 2757,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 6,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 2547,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 7,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2463,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "ok"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 2649
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 2363,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "left"
+    },
+    "gapMs": 2757,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 6,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 2547,
+    "stateId": "fd4369fb80ca",
+    "frameHash": "e070f0e0ca84e0e0"
+   },
+   {
+    "i": 7,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2463,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ]
+ ]
+}

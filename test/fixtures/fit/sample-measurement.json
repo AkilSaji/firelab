@@ -1,0 +1,302 @@
+{
+  "kind": "firelab-measurement",
+  "version": 1,
+  "createdAt": "2026-10-15T18:00:00.000Z",
+  "firelabVersion": "0.1.0",
+  "app": {
+    "package": "com.example.webgame",
+    "url": "http://192.168.1.20:4173/",
+    "name": "Example three.js game (synthetic)"
+  },
+  "device": {
+    "id": "192.168.1.194:5555",
+    "model": "AFTMA08C15",
+    "name": "Fire TV Stick 4K Plus",
+    "gpu": "PowerVR Rogue GE9215",
+    "sdk": 30,
+    "os": "Fire OS 8.1.8.2 (Android 11)",
+    "abis": [
+      "armeabi-v7a",
+      "armeabi"
+    ],
+    "ramMB": 1670,
+    "resolution": {
+      "width": 1920,
+      "height": 1080
+    },
+    "webviewMajor": 138
+  },
+  "webCaps": {
+    "chromeMajor": 138,
+    "chromeVersion": "138.0.7204.180",
+    "webgl1": {
+      "renderer": "PowerVR Rogue GE9215",
+      "maxTextureSize": 8192,
+      "maxRenderbufferSize": 8192,
+      "extensions": [
+        "WEBGL_compressed_texture_etc1",
+        "OES_texture_float"
+      ]
+    },
+    "webgl2": {
+      "renderer": "PowerVR Rogue GE9215",
+      "maxTextureSize": 8192,
+      "maxRenderbufferSize": 8192,
+      "maxSamples": 4,
+      "mediumpPrecision": 10,
+      "extensions": [
+        "EXT_color_buffer_float",
+        "EXT_color_buffer_half_float",
+        "OES_texture_float_linear",
+        "WEBGL_compressed_texture_astc",
+        "WEBGL_compressed_texture_etc",
+        "WEBGL_compressed_texture_etc1",
+        "WEBGL_compressed_texture_pvrtc",
+        "WEBGL_debug_renderer_info",
+        "WEBGL_lose_context"
+      ]
+    },
+    "compressed": [
+      "astc",
+      "etc1",
+      "etc2",
+      "pvrtc"
+    ],
+    "floatRender": true,
+    "features": {
+      "wasm": true,
+      "wasm-simd": true,
+      "offscreen-canvas": true,
+      "webgpu": false
+    }
+  },
+  "needs": {
+    "webgl": 2,
+    "compressed": [
+      "astc"
+    ],
+    "maxTextureSize": 4096,
+    "sources": {
+      "webgl": "inferred",
+      "compressed": "detected",
+      "maxTextureSize": "detected"
+    },
+    "notes": [
+      "three.js r170 draws with WebGL2 only (WebGL1 support was removed in r163)."
+    ]
+  },
+  "targetFps": 30,
+  "runs": [
+    {
+      "label": "tv",
+      "tier": "tv",
+      "url": "http://192.168.1.20:4173/?q=tv",
+      "seconds": 15,
+      "canvas": {
+        "width": 1280,
+        "height": 720
+      },
+      "scale": 1,
+      "frames": {
+        "fpsMedian": 30,
+        "fpsP10": 29.4,
+        "frameMsP50": 33.3,
+        "frameMsP95": 36,
+        "samples": 15,
+        "source": "page",
+        "frameMsFrom": "page",
+        "capped": true
+      },
+      "memory": {
+        "appPssMB": 245,
+        "rendererPssMB": 190,
+        "totalMB": 435,
+        "memAvailableMinMB": 410,
+        "samples": 6
+      },
+      "cpuPct": 128
+    },
+    {
+      "label": "tv-hd",
+      "tier": "tv-hd",
+      "url": "http://192.168.1.20:4173/?q=tv-hd",
+      "seconds": 15,
+      "canvas": {
+        "width": 1920,
+        "height": 1080
+      },
+      "scale": 1,
+      "frames": {
+        "fpsMedian": 27.2,
+        "fpsP10": 23.1,
+        "frameMsP50": 36.8,
+        "frameMsP95": 49.5,
+        "samples": 15,
+        "source": "page",
+        "frameMsFrom": "page",
+        "capped": false
+      },
+      "memory": {
+        "appPssMB": 290,
+        "rendererPssMB": 255,
+        "totalMB": 545,
+        "memAvailableMinMB": 362,
+        "samples": 6
+      },
+      "cpuPct": 141
+    },
+    {
+      "label": "sim:AFTSSS",
+      "tier": "tv",
+      "url": "http://192.168.1.20:4173/?q=tv&scale=1.48",
+      "seconds": 15,
+      "canvas": {
+        "width": 1894,
+        "height": 1066
+      },
+      "scale": 1.48,
+      "frames": {
+        "fpsMedian": 25.1,
+        "fpsP10": 21,
+        "frameMsP50": 39.8,
+        "frameMsP95": 52.3,
+        "samples": 15,
+        "source": "page",
+        "frameMsFrom": "page",
+        "capped": false
+      },
+      "simulated": {
+        "forModel": "AFTSSS",
+        "forGpu": "PowerVR Rogue GE8300",
+        "kinds": [
+          "cpu",
+          "gpu"
+        ],
+        "cpuRate": 1.6,
+        "pixelFactor": 2.2,
+        "scale": 1.48,
+        "note": "Imitates Fire TV Stick (3rd gen) at render scale 1. Estimated (simulated)."
+      }
+    }
+  ],
+  "pressure": {
+    "level": "RUNNING_CRITICAL",
+    "outcome": "survived",
+    "detail": "Same app process and renderer, page state intact.",
+    "memAvailableAfterMB": 401
+  },
+  "media": [
+    {
+      "source": "http://192.168.1.20:4173/video/intro.mp4",
+      "container": "mp4",
+      "brands": [
+        "isom",
+        "iso2",
+        "avc1",
+        "mp41"
+      ],
+      "sizeBytes": 10200000,
+      "durationS": 12,
+      "bitrateKbps": 6800,
+      "fastStart": false,
+      "tracks": [
+        {
+          "kind": "video",
+          "fourcc": "avc1",
+          "codec": "avc",
+          "codecString": "avc1.640028",
+          "profile": "high",
+          "profileIdc": 100,
+          "level": "4.0",
+          "width": 1920,
+          "height": 1080,
+          "fps": 30,
+          "bitDepth": 8,
+          "durationS": 12,
+          "bitrateKbps": 6650
+        },
+        {
+          "kind": "audio",
+          "fourcc": "mp4a",
+          "codecString": "mp4a.40.2",
+          "channels": 2,
+          "sampleRate": 48000,
+          "durationS": 12
+        }
+      ],
+      "video": {
+        "kind": "video",
+        "fourcc": "avc1",
+        "codec": "avc",
+        "codecString": "avc1.640028",
+        "profile": "high",
+        "profileIdc": 100,
+        "level": "4.0",
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "bitDepth": 8,
+        "durationS": 12,
+        "bitrateKbps": 6650
+      },
+      "audio": {
+        "kind": "audio",
+        "fourcc": "mp4a",
+        "codecString": "mp4a.40.2",
+        "channels": 2,
+        "sampleRate": 48000,
+        "durationS": 12
+      },
+      "bytesRead": 65536
+    },
+    {
+      "source": "http://192.168.1.20:4173/video/finale.mp4",
+      "container": "mp4",
+      "brands": [
+        "isom",
+        "av01",
+        "mp41"
+      ],
+      "sizeBytes": 10600000,
+      "durationS": 20,
+      "bitrateKbps": 4240,
+      "fastStart": true,
+      "tracks": [
+        {
+          "kind": "video",
+          "fourcc": "av01",
+          "codec": "av1",
+          "codecString": "av01.0.08M.08",
+          "profile": "main",
+          "profileIdc": 0,
+          "level": "4.0",
+          "width": 1920,
+          "height": 1080,
+          "fps": 30,
+          "bitDepth": 8,
+          "durationS": 20,
+          "bitrateKbps": 4100
+        }
+      ],
+      "video": {
+        "kind": "video",
+        "fourcc": "av01",
+        "codec": "av1",
+        "codecString": "av01.0.08M.08",
+        "profile": "main",
+        "profileIdc": 0,
+        "level": "4.0",
+        "width": 1920,
+        "height": 1080,
+        "fps": 30,
+        "bitDepth": 8,
+        "durationS": 20,
+        "bitrateKbps": 4100
+      },
+      "bytesRead": 65536
+    }
+  ],
+  "notes": [
+    "Synthetic measurement for tests and docs: numbers are modelled on real Sunset Villa runs but were not measured as a set."
+  ]
+}

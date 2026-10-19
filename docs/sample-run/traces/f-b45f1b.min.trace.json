@@ -1,0 +1,65 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792138039651,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [
+  {
+   "i": 0,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 2425,
+   "stateId": "a2f8b8b6b76b",
+   "frameHash": "e07070e08ab1e1c1"
+  },
+  {
+   "i": 1,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 400
+  },
+  {
+   "i": 2,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 400
+  },
+  {
+   "i": 3,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 400
+  }
+ ],
+ "expect": {
+  "oracle": "focus",
+  "signature": "non-spatial-move|sc-fe65d2f07d|#menu-list>li:nth-child(4)|up|#menu-list>li:nth-child(3)"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ },
+ "startStateId": "64b2c3752602"
+}

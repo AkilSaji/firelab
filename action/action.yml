@@ -1,0 +1,316 @@
+name: FireLab lab
+description: >-
+  Tests a Fire TV app without a Fire TV: boots an Android emulator shaped like
+  a real Fire TV model (its Android API level, RAM, heap and screen), installs
+  your APK (or wraps a web URL into one), runs smoke checks (install, launch,
+  launch time, screenshot, no crash or ANR, memory against the model's budget)
+  and `firelab explore` when available, then uploads an HTML report and writes
+  a job summary. Needs a Linux runner with KVM (GitHub's ubuntu-latest has it).
+author: the FireLab authors
+branding:
+  icon: tv
+  color: orange
+
+inputs:
+  apk:
+    description: The APK to test. Give this or `url`.
+    default: ''
+  url:
+    description: >-
+      A web app URL to wrap into an APK with `firelab wrap`. localhost and
+      127.0.0.1 are rewritten to 10.0.2.2 (the runner, as seen from the emulator).
+    default: ''
+  name:
+    description: App name for `url` (the launcher label).
+    default: FireLab test app
+  package:
+    description: "The app's package id (default: read from the APK)."
+    default: ''
+  profile:
+    description: 'Fire TV model to imitate: AFTSSS (Fire TV Stick 3rd gen, 1 GB, Fire OS 7), AFTMA08C15 (4K Plus, 2 GB, Fire OS 8), or any model `firelab lab create --list-models` shows.'
+    default: AFTSSS
+  image:
+    description: 'Optional system image override, e.g. "system-images;android-30;google_apis;x86_64" (has ARM translation for apps with ARM-only native code).'
+    default: ''
+  settle:
+    description: Seconds the app runs before the screenshot, memory and logcat checks.
+    default: '10'
+  max-launch-ms:
+    description: Fail when the launch takes longer than this (empty = only warn above 5000 ms; emulator launch times are not the device's).
+    default: ''
+  explore:
+    description: '"auto" runs `firelab explore` when this FireLab version has it, "true" requires it (fails if missing), "false" skips it.'
+    default: auto
+  explore-minutes:
+    description: How long `firelab explore` plays the app.
+    default: '3'
+  explore-minimize-minutes:
+    description: Time limit for shrinking each finding to its shortest key sequence (runs after explore-minutes). "0" turns shrinking off.
+    default: '2'
+  explore-fail-on:
+    description: What `firelab explore` fails on.
+    default: crash,black,frozen,focus-trap
+  boot-timeout:
+    description: Seconds to wait for the emulator to boot.
+    default: '600'
+  out:
+    description: Folder for the report, screenshot, logcat and JSON.
+    default: firelab-lab
+  artifact-name:
+    description: Name of the uploaded report artifact.
+    default: firelab-lab-report
+  accept-android-licenses:
+    description: >-
+      "true" accepts the Android SDK licences non-interactively (needed to
+      download the system image). Set "false" if your runner already has them.
+    default: 'true'
+  firelab-version:
+    description: The npm version of firelab to run.
+    default: latest
+  command:
+    description: 'Run this instead of "npx --yes firelab@<version>", e.g. "node dist/cli.js" inside the FireLab repo.'
+    default: ''
+  node-version:
+    description: Node.js version.
+    default: '22'
+
+outputs:
+  verdict:
+    description: '"pass" or "fail".'
+    value: ${{ steps.gate.outputs.verdict }}
+  serial:
+    description: The emulator's adb serial.
+    value: ${{ steps.start.outputs.serial }}
+  report:
+    description: Path of the HTML report.
+    value: ${{ steps.smoke.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Check the runner
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" != "Linux" ]; then
+          echo "::error title=FireLab lab::This action needs a Linux runner with KVM (ubuntu-latest). On macOS run \`firelab lab\` locally instead."
+          exit 1
+        fi
+        if [ -z "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}" ]; then
+          echo "::error title=FireLab lab::No Android SDK on this runner (ANDROID_HOME is empty). GitHub's ubuntu-latest runners have one; on other runners install it first (android-actions/setup-android)."
+          exit 1
+        fi
+
+    - name: Enable KVM
+      shell: bash
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules > /dev/null
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+        if [ ! -w /dev/kvm ]; then
+          echo "::error title=FireLab lab::/dev/kvm is not usable on this runner, so the emulator would be far too slow. Use GitHub's ubuntu-latest (or a larger Linux runner)."
+          exit 1
+        fi
+
+    - id: setup
+      name: Create the Fire TV lab
+      shell: bash
+      # Inputs go through the environment, never into the script text.
+      env:
+        LAB_PROFILE: ${{ inputs.profile }}
+        LAB_IMAGE: ${{ inputs.image }}
+        LAB_LICENSES: ${{ inputs.accept-android-licenses }}
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        set -euo pipefail
+        sdk="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+        sm="$sdk/cmdline-tools/latest/bin/sdkmanager"
+        if [ "$LAB_LICENSES" = "true" ]; then (yes || true) | "$sm" --licenses > /dev/null; fi
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        args=(lab create --profile "$LAB_PROFILE" --name firelab-ci --headless --install --force)
+        if [ -n "$LAB_IMAGE" ]; then args+=(--image "$LAB_IMAGE"); fi
+        "${cmd[@]}" "${args[@]}"
+        "${cmd[@]}" lab doctor --profile "$LAB_PROFILE" || true
+
+    - id: app
+      name: Get the APK
+      shell: bash
+      env:
+        LAB_APK: ${{ inputs.apk }}
+        LAB_URL: ${{ inputs.url }}
+        LAB_NAME: ${{ inputs.name }}
+        LAB_PACKAGE: ${{ inputs.package }}
+        LAB_OUT: ${{ inputs.out }}
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        set -euo pipefail
+        mkdir -p "$LAB_OUT"
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        if [ -n "$LAB_APK" ] && [ -n "$LAB_URL" ]; then
+          echo "::error title=FireLab lab::Give either apk or url, not both."
+          exit 1
+        fi
+        if [ -n "$LAB_APK" ]; then
+          if [ ! -f "$LAB_APK" ]; then echo "::error title=FireLab lab::APK not found: $LAB_APK"; exit 1; fi
+          echo "apk=$LAB_APK" >> "$GITHUB_OUTPUT"
+        elif [ -n "$LAB_URL" ]; then
+          url="$LAB_URL"
+          case "$url" in
+            http://localhost*|http://127.0.0.1*|https://localhost*|https://127.0.0.1*)
+              url="$(printf '%s' "$url" | sed -E 's#^(https?://)(localhost|127\.0\.0\.1)#\110.0.2.2#')"
+              echo "::notice title=FireLab lab::Rewrote $LAB_URL to $url (the runner, as seen from the emulator)."
+              ;;
+          esac
+          args=(wrap --url "$url" --name "$LAB_NAME" --no-scan --out "$LAB_OUT/app.apk")
+          if [ -n "$LAB_PACKAGE" ]; then args+=(--package "$LAB_PACKAGE"); fi
+          "${cmd[@]}" "${args[@]}"
+          echo "apk=$LAB_OUT/app.apk" >> "$GITHUB_OUTPUT"
+        else
+          echo "::error title=FireLab lab::Give the action an apk (a path to your APK) or a url (a web app to wrap)."
+          exit 1
+        fi
+
+    - id: start
+      name: Boot the emulator
+      shell: bash
+      env:
+        LAB_TIMEOUT: ${{ inputs.boot-timeout }}
+        LAB_OUT: ${{ inputs.out }}
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        set -euo pipefail
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        if ! "${cmd[@]}" lab start firelab-ci --headless --cold --timeout "$LAB_TIMEOUT" --json > "$LAB_OUT/start.json"; then
+          echo "::error title=FireLab lab::The emulator did not boot (see the step log and ~/.firelab/lab/firelab-ci.log)."
+          cp ~/.firelab/lab/firelab-ci.log "$LAB_OUT/" 2>/dev/null || true
+          exit 1
+        fi
+        serial="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).serial)' "$LAB_OUT/start.json")"
+        echo "serial=$serial" >> "$GITHUB_OUTPUT"
+        node -e 'for (const w of JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).warnings ?? []) console.log(`::warning title=FireLab lab::${w}`)' "$LAB_OUT/start.json"
+
+    - id: smoke
+      name: Smoke checks
+      shell: bash
+      env:
+        LAB_APK: ${{ steps.app.outputs.apk }}
+        LAB_PACKAGE: ${{ inputs.package }}
+        LAB_SERIAL: ${{ steps.start.outputs.serial }}
+        LAB_PROFILE: ${{ inputs.profile }}
+        LAB_SETTLE: ${{ inputs.settle }}
+        LAB_MAX_LAUNCH: ${{ inputs.max-launch-ms }}
+        LAB_OUT: ${{ inputs.out }}
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        set -uo pipefail
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        args=(lab smoke --apk "$LAB_APK" -d "$LAB_SERIAL" --profile "$LAB_PROFILE" --out "$LAB_OUT" --settle "$LAB_SETTLE" --summary "${GITHUB_STEP_SUMMARY:-/dev/null}")
+        if [ -n "$LAB_PACKAGE" ]; then args+=(--package "$LAB_PACKAGE"); fi
+        if [ -n "$LAB_MAX_LAUNCH" ]; then args+=(--max-launch-ms "$LAB_MAX_LAUNCH"); fi
+        "${cmd[@]}" "${args[@]}"
+        code=$?
+        echo "report=$LAB_OUT/report.html" >> "$GITHUB_OUTPUT"
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        if [ -f "$LAB_OUT/smoke.json" ]; then
+          echo "package=$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).package ?? "")' "$LAB_OUT/smoke.json")" >> "$GITHUB_OUTPUT"
+        fi
+        case $code in
+          0) ;;
+          2) echo "::error title=FireLab lab::Smoke checks failed on the emulator (see the job summary and the report artifact)." ;;
+          *) echo "::error title=FireLab lab::The smoke checks could not run (exit $code)." ;;
+        esac
+        exit 0
+
+    - id: explore
+      name: Explore (plays the app with the remote)
+      if: inputs.explore != 'false' && steps.smoke.outputs.code != ''
+      shell: bash
+      env:
+        LAB_MODE: ${{ inputs.explore }}
+        LAB_APK: ${{ steps.app.outputs.apk }}
+        LAB_SERIAL: ${{ steps.start.outputs.serial }}
+        LAB_MINUTES: ${{ inputs.explore-minutes }}
+        LAB_FAIL_ON: ${{ inputs.explore-fail-on }}
+        LAB_MINIMIZE: ${{ inputs.explore-minimize-minutes }}
+        LAB_OUT: ${{ inputs.out }}
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        set -uo pipefail
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        summary="${GITHUB_STEP_SUMMARY:-/dev/null}"
+        help="$("${cmd[@]}" explore --help 2>&1)"; hcode=$?
+        if [ $hcode -ne 0 ] || printf '%s' "$help" | grep -qiE 'unknown command|coming soon'; then
+          msg="firelab explore is not available in this FireLab version (\`firelab explore --help\` exited $hcode), so the game-testing pass did not run."
+          if [ "$LAB_MODE" = "true" ]; then
+            echo "::error title=FireLab explore::$msg Set explore: auto to skip it, or use a FireLab version that has explore."
+            printf '\n| ❌ | Explore | %s |\n' "$msg" >> "$summary"
+            echo "status=missing" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning title=FireLab explore::$msg"
+            printf '\n> ➖ Explore skipped: %s\n' "$msg" >> "$summary"
+            echo "status=skipped" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+        fi
+        mkdir -p "$LAB_OUT/explore"
+        args=(explore --apk "$LAB_APK" -d "$LAB_SERIAL" --minutes "$LAB_MINUTES" --fail-on "$LAB_FAIL_ON" --out "$LAB_OUT/explore" --json)
+        if [ "$LAB_MINIMIZE" = "0" ]; then args+=(--no-minimize); else args+=(--minimize-minutes "$LAB_MINIMIZE"); fi
+        "${cmd[@]}" "${args[@]}" > "$LAB_OUT/explore/result.json"
+        code=$?
+        report="$(find "$LAB_OUT/explore" -name "*.html" 2>/dev/null | head -n 1 || true)"
+        if [ $code -eq 0 ]; then
+          printf '\n| ✅ | Explore (%s min) | no %s found%s |\n' "$LAB_MINUTES" "$LAB_FAIL_ON" "${report:+, report in the artifact}" >> "$summary"
+          echo "status=pass" >> "$GITHUB_OUTPUT"
+        else
+          echo "::error title=FireLab explore::firelab explore found problems (exit $code): see $LAB_OUT/explore in the report artifact."
+          printf '\n| ❌ | Explore (%s min) | found problems (exit %s)%s |\n' "$LAB_MINUTES" "$code" "${report:+, see the explore report in the artifact}" >> "$summary"
+          echo "status=fail" >> "$GITHUB_OUTPUT"
+        fi
+        md="$(find "$LAB_OUT/explore" -name report.md 2>/dev/null | head -n 1 || true)"
+        if [ -n "$md" ]; then { printf '\n'; cat "$md"; } >> "$summary"; fi
+        exit 0
+
+    - name: Upload the report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.out }}
+        if-no-files-found: warn
+
+    - name: Stop the emulator
+      if: always()
+      shell: bash
+      env:
+        LAB_VERSION: ${{ inputs.firelab-version }}
+        LAB_COMMAND: ${{ inputs.command }}
+      run: |
+        if [ -n "$LAB_COMMAND" ]; then read -ra cmd <<< "$LAB_COMMAND"; else cmd=(npx --yes "firelab@${LAB_VERSION}"); fi
+        "${cmd[@]}" lab stop firelab-ci || true
+
+    - id: gate
+      name: Verdict
+      if: always()
+      shell: bash
+      env:
+        SMOKE: ${{ steps.smoke.outputs.code }}
+        EXPLORE: ${{ steps.explore.outputs.status }}
+      run: |
+        if [ "$SMOKE" = "0" ] && [ "$EXPLORE" != "fail" ] && [ "$EXPLORE" != "missing" ]; then
+          echo "verdict=pass" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        echo "verdict=fail" >> "$GITHUB_OUTPUT"
+        if [ -z "$SMOKE" ]; then echo "FireLab lab: the emulator or the app setup failed before the smoke checks (see the earlier steps)."
+        elif [ "$SMOKE" != "0" ]; then echo "FireLab lab: smoke checks failed (exit $SMOKE)."; fi
+        if [ "$EXPLORE" = "fail" ]; then echo "FireLab lab: firelab explore found problems."; fi
+        if [ "$EXPLORE" = "missing" ]; then echo "FireLab lab: explore: true, but this FireLab version has no \`firelab explore\`."; fi
+        exit 1

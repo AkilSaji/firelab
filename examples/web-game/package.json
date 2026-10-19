@@ -1,0 +1,11 @@
+{
+  "name": "@firelab/example-web-game",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Firefly Lake: a small three.js TV game that uses @firelab/perf end to end.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs"
+  }
+}

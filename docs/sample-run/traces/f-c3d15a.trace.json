@@ -1,0 +1,639 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792138018988,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [
+  {
+   "i": 0,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 0,
+   "stateId": "64b2c3752602",
+   "frameHash": "50787030000080dc"
+  },
+  {
+   "i": 1,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 2425,
+   "stateId": "a2f8b8b6b76b",
+   "frameHash": "e07070e08ab1e1c1"
+  },
+  {
+   "i": 2,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4133,
+   "stateId": "73fafefebee3",
+   "frameHash": "e07070e8e2e0e0e0"
+  },
+  {
+   "i": 3,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 3995,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f8fcf0e0e0"
+  },
+  {
+   "i": 4,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4337,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2f2e0e0"
+  },
+  {
+   "i": 5,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4292,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fc8ad2f0e0"
+  },
+  {
+   "i": 6,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4110,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f89cb2e3c7"
+  },
+  {
+   "i": 7,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2662,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d0e0e0"
+  },
+  {
+   "i": 8,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2701,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fccab2f0f0"
+  },
+  {
+   "i": 9,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2786,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d3e0c0"
+  },
+  {
+   "i": 10,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2643,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fccaf2e0e0"
+  },
+  {
+   "i": 11,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 3070,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fc8a93c743"
+  },
+  {
+   "i": 12,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 2755,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fcc2c0e0e0"
+  },
+  {
+   "i": 13,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2789,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070e89cd2e66e"
+  },
+  {
+   "i": 14,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2837,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d1c1c0"
+  },
+  {
+   "i": 15,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 3031,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fccac2c0f0"
+  },
+  {
+   "i": 16,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2507,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d3c383"
+  },
+  {
+   "i": 17,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2866,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fccae0e0e0"
+  },
+  {
+   "i": 18,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 3051,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fc8af3c717"
+  },
+  {
+   "i": 19,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 3138,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fcc2f1e1e0"
+  },
+  {
+   "i": 20,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2643,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f8dce2e0e6"
+  },
+  {
+   "i": 21,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2926,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2f1c1c3"
+  },
+  {
+   "i": 22,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2575,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fccae0e0e0"
+  },
+  {
+   "i": 23,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2705,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070e8dc92e0c1"
+  },
+  {
+   "i": 24,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2458,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fcaad0c0e0"
+  },
+  {
+   "i": 25,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2721,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070e8dcd3c2e0"
+  },
+  {
+   "i": 26,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 3007,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f8fcd0e0e0"
+  },
+  {
+   "i": 27,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 2863,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f89cd2f0e0"
+  },
+  {
+   "i": 28,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 3077,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d3c0e0"
+  },
+  {
+   "i": 29,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2566,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fc8af0e0e0"
+  },
+  {
+   "i": 30,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 3108,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2d3c347"
+  },
+  {
+   "i": 31,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2785,
+   "stateId": "927c7ca8669d",
+   "frameHash": "e07070f89cf0c0c0"
+  },
+  {
+   "i": 32,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2570,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2c3c3c7"
+  },
+  {
+   "i": 33,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 2763,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e0f0f0e0e2f2e0e0"
+  },
+  {
+   "i": 34,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 2893,
+   "stateId": "6940b9e0d5d4",
+   "frameHash": "e07070e0e2f2e0c7"
+  },
+  {
+   "i": 35,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 3258,
+   "stateId": "963b0d51e993",
+   "frameHash": "e07070fcc2d1e0c0"
+  },
+  {
+   "i": 36,
+   "action": {
+    "kind": "key",
+    "key": "back"
+   },
+   "gapMs": 4076,
+   "stateId": "EXIT",
+   "frameHash": "81f385e58d8cd5f0"
+  }
+ ],
+ "expect": {
+  "oracle": "health",
+  "signature": "unexpected-exit:963b0d51e993:back"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ },
+ "startStateId": "64b2c3752602",
+ "shortcuts": [
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 4076,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3258,
+    "stateId": "963b0d51e993",
+    "frameHash": "e07070fcc2d1e0c0"
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 4076,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 2893,
+    "stateId": "6940b9e0d5d4",
+    "frameHash": "e07070e0e2f2e0c7"
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3258,
+    "stateId": "963b0d51e993",
+    "frameHash": "e07070fcc2d1e0c0"
+   },
+   {
+    "i": 6,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 4076,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "menu"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "left"
+    },
+    "gapMs": 2763,
+    "stateId": "6940b9e0d5d4",
+    "frameHash": "e0f0f0e0e2f2e0e0"
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 2893,
+    "stateId": "6940b9e0d5d4",
+    "frameHash": "e07070e0e2f2e0c7"
+   },
+   {
+    "i": 6,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3258,
+    "stateId": "963b0d51e993",
+    "frameHash": "e07070fcc2d1e0c0"
+   },
+   {
+    "i": 7,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 4076,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ]
+ ]
+}

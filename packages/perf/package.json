@@ -1,0 +1,61 @@
+{
+  "name": "@firelab/perf",
+  "version": "0.1.0",
+  "description": "Keep TV web games smooth: GPU/chip detection mapped to quality tiers, adaptive resolution that holds a target fps, an on-screen meter, and the window.firelab hook for the FireLab tester. Dependency-free, no build step.",
+  "license": "MIT",
+  "author": "the FireLab authors",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./chips": {
+      "types": "./chips.d.ts",
+      "default": "./chips.js"
+    },
+    "./auto": {
+      "types": "./auto.d.ts",
+      "default": "./auto.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "chips.js",
+    "chips.d.ts",
+    "auto.js",
+    "auto.d.ts",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./auto.js"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "fire-tv",
+    "android-tv",
+    "webgl",
+    "three.js",
+    "babylonjs",
+    "pixijs",
+    "performance",
+    "fps",
+    "adaptive-resolution",
+    "gpu-detection",
+    "quality-tiers",
+    "tv",
+    "games"
+  ]
+}

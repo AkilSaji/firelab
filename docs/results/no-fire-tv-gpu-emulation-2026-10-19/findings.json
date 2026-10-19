@@ -1,0 +1,121 @@
+[
+ {
+  "oracle": "health",
+  "kind": "js-exception",
+  "severity": "major",
+  "title": "Uncaught: Error: WebGL2 not available",
+  "detail": "Error: WebGL2 not available\n  at http://127.0.0.1:8080/examples/web-game/game.js:53",
+  "signature": "js-error:Error: WebGL# not available@game.js:53",
+  "stateId": "0545176c14f7",
+  "step": 1,
+  "ts": 1792421607238,
+  "evidence": {
+   "thumbs": [
+    "f-6ccec9.jpg",
+    "s-0545176c14f7.jpg"
+   ],
+   "logs": [
+    "Error: WebGL2 not available"
+   ],
+   "probe": {
+    "raf": 19,
+    "errors": 0,
+    "paused": false,
+    "targetFps": 30,
+    "fps": 60,
+    "url": "/examples/web-game/",
+    "glLost": 0,
+    "heapMB": 6
+   }
+  },
+  "id": "f-6ccec9",
+  "trace": "f-6ccec9.trace.json",
+  "device": {
+   "serial": "browser",
+   "model": "browser",
+   "name": "Chrome/155.0.8059.84 (headless, Fire TV viewport)"
+  },
+  "status": "new",
+  "count": 2
+ },
+ {
+  "oracle": "gpu",
+  "kind": "gpu-unsupported",
+  "severity": "major",
+  "title": "getContext(\"webgl2\") fails on AFTT: returned null: no WebGL2 on Mali-450 MP4",
+  "detail": "Under the Fire TV Stick (2nd gen) / Basic Edition (AFTT, Mali-450 MP4) GPU profile, getContext(\"webgl2\") returned null: no WebGL2 on Mali-450 MP4. This copies the GPU's WebGL features and limits, not its speed.",
+  "signature": "gpu:getContext(\"webgl2\"):returned null: no WebGL# on Mali-# MP#",
+  "stateId": "0545176c14f7",
+  "step": 1,
+  "ts": 1792421607238,
+  "evidence": {
+   "thumbs": [
+    "f-edee57.jpg",
+    "s-0545176c14f7.jpg"
+   ],
+   "logs": [
+    "[firelab-gpu] getContext(\"webgl2\") returned null: no WebGL2 on Mali-450 MP4"
+   ],
+   "probe": {
+    "raf": 19,
+    "errors": 0,
+    "paused": false,
+    "targetFps": 30,
+    "fps": 60,
+    "url": "/examples/web-game/",
+    "glLost": 0,
+    "heapMB": 6
+   }
+  },
+  "id": "f-edee57",
+  "trace": "f-edee57.trace.json",
+  "device": {
+   "serial": "browser",
+   "model": "browser",
+   "name": "Chrome/155.0.8059.84 (headless, Fire TV viewport)"
+  },
+  "status": "new",
+  "count": 2
+ },
+ {
+  "oracle": "screen",
+  "kind": "render-loop-stopped",
+  "severity": "critical",
+  "title": "The render loop stopped in \"0545176c14f7\"",
+  "detail": "window.firelab says the app renders at 30 fps and is not paused, but no frame was drawn for 2533 ms (frame counter stuck at 103, draws).",
+  "signature": "render-loop-stopped@0545176c14f7",
+  "stateId": "0545176c14f7",
+  "step": 108,
+  "ts": 1792421659331,
+  "evidence": {
+   "thumbs": [
+    "f-21bdf1.jpg",
+    "s-0545176c14f7.jpg"
+   ],
+   "logs": [],
+   "probe": {
+    "raf": 103,
+    "errors": 0,
+    "paused": false,
+    "targetFps": 30,
+    "fps": 60,
+    "url": "/examples/web-game/",
+    "glLost": 0,
+    "heapMB": 4
+   },
+   "numbers": {
+    "stoppedMs": 2533,
+    "raf": 103
+   }
+  },
+  "id": "f-21bdf1",
+  "trace": "f-21bdf1.trace.json",
+  "device": {
+   "serial": "browser",
+   "model": "browser",
+   "name": "Chrome/155.0.8059.84 (headless, Fire TV viewport)"
+  },
+  "status": "new",
+  "count": 1
+ }
+]

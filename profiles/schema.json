@@ -1,0 +1,644 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FireLab device profile",
+  "description": "What one Fire TV / Android TV model really has, with the source of every value. Written by `firelab profile`; read by `firelab fit`.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "model",
+    "name",
+    "source",
+    "capturedAt",
+    "firelabVersion",
+    "os",
+    "cpu",
+    "memory",
+    "gpu",
+    "webgl",
+    "webview",
+    "media",
+    "display"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "model": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{2,40}$",
+      "description": "ro.product.model, e.g. AFTSSS"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "enum": [
+        "measured",
+        "manual"
+      ],
+      "description": "measured = written by `firelab profile`; manual = entered by hand from measurements"
+    },
+    "capturedAt": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}"
+    },
+    "firelabVersion": {
+      "type": "string"
+    },
+    "os": {
+      "type": "object",
+      "required": [
+        "fireOs",
+        "android",
+        "sdk"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "fireOs": {
+          "$ref": "#/$defs/factString"
+        },
+        "android": {
+          "$ref": "#/$defs/factString"
+        },
+        "sdk": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "build": {
+          "$ref": "#/$defs/factString"
+        }
+      }
+    },
+    "cpu": {
+      "type": "object",
+      "required": [
+        "abis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "abis": {
+          "$ref": "#/$defs/factStrings"
+        },
+        "soc": {
+          "$ref": "#/$defs/factString"
+        },
+        "cores": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "maxGHz": {
+          "$ref": "#/$defs/factNumber"
+        }
+      }
+    },
+    "memory": {
+      "type": "object",
+      "required": [
+        "totalMB",
+        "availIdleMB",
+        "availWebViewMB",
+        "appBudgetMB",
+        "appLimitMB"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "totalMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "availIdleMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "availWebViewMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "knownGoodMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "lowestAvailMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "appBudgetMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "appLimitMB": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "lowRam": {
+          "$ref": "#/$defs/factBoolean"
+        }
+      }
+    },
+    "gpu": {
+      "type": "object",
+      "required": [
+        "renderer",
+        "speedFactor"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "renderer": {
+          "$ref": "#/$defs/factString"
+        },
+        "vendor": {
+          "$ref": "#/$defs/factString"
+        },
+        "speedFactor": {
+          "$ref": "#/$defs/factNumber"
+        }
+      }
+    },
+    "webgl": {
+      "type": "object",
+      "required": [
+        "webgl1",
+        "webgl2",
+        "maxTextureSize",
+        "maxRenderbufferSize",
+        "extensions",
+        "compressed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "webgl1": {
+          "$ref": "#/$defs/factBoolean"
+        },
+        "webgl2": {
+          "$ref": "#/$defs/factBoolean"
+        },
+        "maxTextureSize": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "maxRenderbufferSize": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "extensions": {
+          "$ref": "#/$defs/factStrings"
+        },
+        "compressed": {
+          "type": "object",
+          "required": [
+            "value",
+            "source"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "etc1",
+                      "etc2",
+                      "astc",
+                      "s3tc",
+                      "pvrtc",
+                      "bptc",
+                      "rgtc",
+                      "atc"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "floatRender": {
+          "$ref": "#/$defs/factBoolean"
+        },
+        "mediumpFp16": {
+          "$ref": "#/$defs/factBoolean"
+        }
+      }
+    },
+    "webview": {
+      "type": "object",
+      "required": [
+        "version",
+        "major"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "$ref": "#/$defs/factString"
+        },
+        "major": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "package": {
+          "$ref": "#/$defs/factString"
+        }
+      }
+    },
+    "media": {
+      "type": "object",
+      "required": [
+        "decoders"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "decoders": {
+          "type": "object",
+          "required": [
+            "value",
+            "source"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/decoder"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "streamOkMbps": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "streamStallMbps": {
+          "$ref": "#/$defs/factNumber"
+        },
+        "canPlay": {
+          "type": "object",
+          "required": [
+            "value",
+            "source"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source": {
+              "$ref": "#/$defs/source"
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "display": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "height": {
+          "$ref": "#/$defs/factInteger"
+        },
+        "density": {
+          "$ref": "#/$defs/factInteger"
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reference"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "enum": [
+        "measured",
+        "spec",
+        "estimated",
+        "unknown"
+      ]
+    },
+    "factString": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "factNumber": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "factInteger": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "factBoolean": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "factStrings": {
+      "type": "object",
+      "required": [
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "decoder": {
+      "type": "object",
+      "required": [
+        "codec",
+        "supported"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "codec": {
+          "enum": [
+            "avc",
+            "hevc",
+            "vp9",
+            "av1"
+          ]
+        },
+        "supported": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "maxWidth": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxHeight": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxFps": {
+          "type": "number",
+          "minimum": 1
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maxLevel": {
+          "type": "string",
+          "pattern": "^\\d(\\.\\d)?$"
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "required": [
+        "app"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "scene": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "resolution": {
+          "type": "string"
+        },
+        "fps": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "appPssMB": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "rendererPssMB": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "memAvailableMB": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          ]
+        },
+        "drawCalls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "triangles": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "date": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

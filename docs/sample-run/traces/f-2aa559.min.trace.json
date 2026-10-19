@@ -1,0 +1,81 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792138058082,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [
+  {
+   "i": 0,
+   "action": {
+    "kind": "key",
+    "key": "menu"
+   },
+   "gapMs": 0,
+   "stateId": "a2f8b8b6b76b",
+   "frameHash": "e070b2e0cad0e2e0"
+  },
+  {
+   "i": 1,
+   "action": {
+    "kind": "key",
+    "key": "playpause"
+   },
+   "gapMs": 4761,
+   "stateId": "8c357d491b95",
+   "frameHash": "62f8b0e0c0d0e0e0"
+  },
+  {
+   "i": 2,
+   "action": {
+    "kind": "key",
+    "key": "ok"
+   },
+   "gapMs": 2575,
+   "stateId": "4f36480af2e2",
+   "frameHash": "637a70e8c8c560a0"
+  },
+  {
+   "i": 3,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 3757,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560a0"
+  },
+  {
+   "i": 4,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 4182,
+   "stateId": "c841d2c74ab1",
+   "frameHash": "637a70e8c8c560a0"
+  }
+ ],
+ "expect": {
+  "oracle": "screen",
+  "signature": "render-loop-stopped@playing"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ },
+ "startStateId": "64b2c3752602"
+}

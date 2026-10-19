@@ -1,0 +1,169 @@
+/* FireLab design tokens, taken from the logo: a flame (amber → orange → red →
+ * magenta) on a deep plum-black face with glowing yellow eyes.
+ *
+ * Dark (plum-black) is the default. Light (warm white) applies when the viewer
+ * picks it with the toggle (<html data-theme="light">).
+ * The TV stays black in both themes, like the real thing.
+ */
+
+:root {
+  /* type */
+  --font-ui: "Inter", "SF Pro Text", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter", "SF Pro Display", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --font-num: var(--font-display);
+
+  --fs-2xs: 11px;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 24px;
+
+  /* shape + space */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --gap: 20px;
+  --pad: 20px;
+
+  /* layout */
+  --remote-w: 168px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur: 150ms;
+
+  /* brand: the flame */
+  --brand-grad: linear-gradient(120deg, #ffc531 0%, #ff8a00 38%, #ff4a2b 72%, #c2185b 100%);
+  --hero-grad: linear-gradient(135deg, #ff9a1f 0%, #ff5a28 52%, #b8145c 100%);
+
+  /* the TV: identical in both themes */
+  --hw-bezel: #0e0a12;
+  --hw-bezel-hi: #2a2230;
+  --tally-red: #ff3b3b;
+
+  color-scheme: dark;
+
+  /* surfaces: the plum-black of the mascot's face */
+  --bg-0: #0d0910;
+  --bg-1: #160f1b;
+  --bg-2: #1c1423;
+  --bg-3: #261b2e;
+  --bg-inset: #120c16;
+  --bg-hover: #22182a;
+  --bg-active: #2c1a26;
+
+  /* lines */
+  --line-1: #241a2b;
+  --line-2: #322539;
+  --line-3: #4a3a53;
+
+  /* ink */
+  --ink-1: #f8f2f6;
+  --ink-2: #cdbfca;
+  --ink-3: #9d8b9c;
+  --ink-4: #6c5b6d;
+
+  /* accent: flame orange */
+  --accent: #ff7a1a;
+  --accent-hi: #ff9442;
+  --accent-ink: #1d0a00;
+  --accent-soft: rgb(255 122 26 / 0.14);
+  --accent-line: rgb(255 122 26 / 0.5);
+
+  /* status (always shown with a label or icon) */
+  --ok: #34d399;
+  --ok-soft: rgb(52 211 153 / 0.13);
+  --warn: #ffd23f;
+  --warn-soft: rgb(255 210 63 / 0.13);
+  --bad: #ff4d6d;
+  --bad-soft: rgb(255 77 109 / 0.14);
+  --info: #c084fc;
+  --info-soft: rgb(192 132 252 / 0.14);
+
+  /* charts */
+  --chart-grid: #241a2b;
+  --chart-axis: #7a6879;
+  --series-fps: #ff8a1f;
+  --series-scale: #c084fc;
+  --series-mem: #34d399;
+  --series-cpu: #ff4d8d;
+  --series-frame: #ffc531;
+  --series-net: #38bdf8;
+  --series-temp: #fb7185;
+  --key-remote: #2dd4bf;
+  --key-dash: #ff8a1f;
+  --chart-ref: #e9dbe5;
+
+  /* tier identity (chips, sweep bars) */
+  --tier-low: #9d8b9c;
+  --tier-tv: #ffc531;
+  --tier-tv-hd: #ff7a1a;
+  --tier-high: #ff4d8d;
+
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 22px -12px rgb(0 0 0 / 0.55);
+  --shadow-2: 0 16px 40px -8px rgb(0 0 0 / 0.65), 0 4px 10px rgb(0 0 0 / 0.4);
+  --shadow-accent: 0 8px 22px -6px rgb(255 122 26 / 0.55);
+  --hero-shadow: 0 12px 26px -14px rgb(255 80 40 / 0.75);
+  --focus: #ffb36b;
+  --scrollbar: #3a2c42;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-0: #fbf6f2;
+  --bg-1: #ffffff;
+  --bg-2: #ffffff;
+  --bg-3: #f6ece5;
+  --bg-inset: #fcf8f5;
+  --bg-hover: #f8efe8;
+  --bg-active: #fff1e5;
+  --line-1: #f1e6de;
+  --line-2: #e7d8cd;
+  --line-3: #d3c0b3;
+  --ink-1: #1d1220;
+  --ink-2: #4e3f52;
+  --ink-3: #76657a;
+  --ink-4: #a594a6;
+  --accent: #f05a00;
+  --accent-hi: #d24d00;
+  --accent-ink: #ffffff;
+  --accent-soft: rgb(240 90 0 / 0.09);
+  --accent-line: rgb(240 90 0 / 0.38);
+  --ok: #0f9f6e;
+  --ok-soft: rgb(15 159 110 / 0.1);
+  --warn: #c27c00;
+  --warn-soft: rgb(194 124 0 / 0.11);
+  --bad: #e0234e;
+  --bad-soft: rgb(224 35 78 / 0.09);
+  --info: #8b3fd9;
+  --info-soft: rgb(139 63 217 / 0.09);
+  --chart-grid: #f3e9e2;
+  --chart-axis: #a08d9f;
+  --series-fps: #f05a00;
+  --series-scale: #8b3fd9;
+  --series-mem: #0f9f6e;
+  --series-cpu: #e11d74;
+  --series-frame: #c27c00;
+  --series-net: #0284c7;
+  --series-temp: #e11d48;
+  --key-remote: #0d9488;
+  --key-dash: #f05a00;
+  --chart-ref: #3d2c40;
+  --tier-low: #94a3b8;
+  --tier-tv: #d99400;
+  --tier-tv-hd: #f05a00;
+  --tier-high: #e11d74;
+  --shadow-1: 0 1px 2px rgb(60 20 10 / 0.05), 0 1px 3px rgb(60 20 10 / 0.05);
+  --shadow-card: 0 1px 2px rgb(60 20 10 / 0.04), 0 6px 18px -8px rgb(60 20 10 / 0.1);
+  --shadow-2: 0 16px 40px -8px rgb(60 20 10 / 0.18), 0 4px 10px -2px rgb(60 20 10 / 0.08);
+  --shadow-accent: 0 8px 20px -6px rgb(240 90 0 / 0.45);
+  --hero-shadow: 0 12px 26px -14px rgb(240 80 30 / 0.6);
+  --focus: #d24d00;
+  --scrollbar: #e0cfc3;
+}

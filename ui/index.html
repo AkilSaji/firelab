@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FireLab · Device Lab</title>
+  <meta name="description" content="FireLab dashboard: live screen, virtual remote, performance, test engine, scenarios and reports for Fire TV and Android TV.">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#140d18">
+  <script>
+    // Apply a saved theme before first paint (no flash).
+    try { var t = JSON.parse(localStorage.getItem('firelab.theme')); if (t === 'light') document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/remote.css">
+  <link rel="stylesheet" href="css/panes.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#screen">Skip to the live screen</a>
+
+<div class="app" id="app" data-page="devices">
+  <!-- ============================================================ top bar -->
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="FireLab">
+      <img class="brand-mark" src="logo.png" alt="" width="36" height="36">
+      <span class="brand-name">FireLab</span>
+    </a>
+    <nav class="pagenav" id="pagenav" aria-label="Pages">
+      <a class="pagenav-link" href="#page=devices" data-page="devices"><svg class="icon"><use href="#i-tv"/></svg><span>Devices</span></a>
+      <a class="pagenav-link" href="#page=tests" data-page="tests"><svg class="icon"><use href="#i-flask"/></svg><span>Tests</span><span class="pagenav-dot" id="nav-running" hidden title="A test is running"></span></a>
+      <a class="pagenav-link" href="#page=scenarios" data-page="scenarios"><svg class="icon"><use href="#i-replay"/></svg><span>Scenarios</span></a>
+      <a class="pagenav-link" href="#page=logs" data-page="logs"><svg class="icon"><use href="#i-terminal"/></svg><span>Logs</span></a>
+      <a class="pagenav-link" href="#page=reports" data-page="reports"><svg class="icon"><use href="#i-book"/></svg><span>Reports</span></a>
+    </nav>
+    <div class="topbar-device" id="topbar-device" aria-live="polite"></div>
+    <div class="topbar-status">
+      <span class="status-pill" id="adb-pill" title="adb on this computer"><span class="dot"></span><span class="status-pill-label">ADB</span><span class="status-pill-val">…</span></span>
+      <span class="status-pill" id="stream-pill" title="Live event stream from the selected device"><span class="dot"></span><span class="status-pill-label">Stream</span><span class="status-pill-val">idle</span></span>
+      <button class="icon-btn" id="shortcuts-btn" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)"><svg class="icon"><use href="#i-keyboard"/></svg></button>
+      <button class="icon-btn theme-btn" id="theme-btn" type="button" aria-label="Switch theme">
+        <svg class="icon icon-sun"><use href="#i-sun"/></svg><svg class="icon icon-moon"><use href="#i-moon"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="banner" id="server-banner" role="alert" hidden>
+    <svg class="icon"><use href="#i-alert"/></svg>
+    <span><b>Lost the FireLab server.</b> Is <code>firelab ui</code> still running in your terminal? Retrying every few seconds…</span>
+    <button class="btn btn-sm" type="button" id="server-retry">Retry now</button>
+  </div>
+
+  <!-- ============================================================ devices rail -->
+  <aside class="rail" aria-labelledby="rail-title">
+    <div class="rail-head">
+      <h2 class="rail-title" id="rail-title">Connected devices <span class="count" id="dev-count">0</span></h2>
+      <button class="btn btn-sm" type="button" id="scan-btn" aria-label="Scan Wi-Fi" title="Look for TVs with ADB debugging on this Wi-Fi network">
+        <svg class="icon"><use href="#i-radar"/></svg><span>Scan</span>
+      </button>
+    </div>
+    <div class="rail-body" id="rail-body">
+      <div id="rail-notice"></div>
+      <label class="search rail-search" id="device-search-wrap">
+        <svg class="icon"><use href="#i-search"/></svg>
+        <span class="sr-only">Search devices</span>
+        <input type="search" id="device-search" placeholder="Search devices…" spellcheck="false" autocomplete="off">
+      </label>
+      <ul class="device-list" id="device-list" aria-label="Connected devices"></ul>
+      <div class="scan-results" id="scan-results" hidden></div>
+      <form class="connect-form" id="connect-form" autocomplete="off">
+        <label class="rail-label" for="connect-ip">Connect by IP</label>
+        <div class="input-row">
+          <input class="input input-mono" id="connect-ip" name="ip" placeholder="192.168.1.50" inputmode="decimal" spellcheck="false" aria-describedby="connect-hint">
+          <button class="btn btn-primary btn-sm" type="submit"><svg class="icon"><use href="#i-plug"/></svg>Connect</button>
+        </div>
+        <p class="hint" id="connect-hint">Port 5555 is assumed. Find the IP on the TV under Settings → My Fire TV → About → Network.</p>
+      </form>
+      <section class="known" id="known-devices" hidden>
+        <h3 class="rail-label">Recently used</h3>
+        <ul class="known-list" id="known-list"></ul>
+      </section>
+
+      <!-- ------------------------------------------------ test engine -->
+      <section class="engine" id="engine" aria-labelledby="engine-title">
+        <div class="engine-head">
+          <h2 class="rail-title" id="engine-title"><svg class="icon"><use href="#i-flask"/></svg>Test Engine</h2>
+          <span class="engine-dev" id="engine-dev"></span>
+        </div>
+        <div class="seg engine-tabs" role="tablist" aria-label="Test Engine">
+          <button class="seg-btn" role="tab" id="etab-quick" aria-controls="epane-quick" aria-selected="true" aria-pressed="true" type="button">Quick Tests</button>
+          <button class="seg-btn" role="tab" id="etab-custom" aria-controls="epane-custom" aria-selected="false" aria-pressed="false" tabindex="-1" type="button">Custom</button>
+          <button class="seg-btn" role="tab" id="etab-scen" aria-controls="epane-scen" aria-selected="false" aria-pressed="false" tabindex="-1" type="button">Scenarios</button>
+        </div>
+
+        <div class="engine-pane" role="tabpanel" id="epane-quick" aria-labelledby="etab-quick">
+          <label class="field">
+            <span class="field-label">App under test</span>
+            <select class="input" id="engine-app"><option value="">foreground app</option></select>
+          </label>
+          <div class="quick-grid" id="quick-grid">
+            <button class="quick" type="button" data-test="app-launch" title="Launches the app from cold, times it, checks it is still running, the screen isn't black, memory against this model's budget, and logcat for crashes and ANRs (lab smoke)">
+              <svg class="icon"><use href="#i-rocket"/></svg><b>App launch</b><small>time · crash · memory</small></button>
+            <button class="quick" type="button" data-test="navigation" title="A short engine run (health, screen and focus oracles) that hunts D-pad focus traps, unreachable controls and odd moves">
+              <svg class="icon"><use href="#i-remote"/></svg><b>Navigation</b><small>D-pad focus · <span data-q="nav-min">3</span> min</small></button>
+            <button class="quick" type="button" data-test="performance" title="Measures the app's frame rate, memory and CPU, then passes or fails it against the target fps">
+              <svg class="icon"><use href="#i-gauge"/></svg><b>Performance</b><small>fps vs <span data-q="target">30</span> · <span data-q="perf-s">15</span> s</small></button>
+            <button class="quick" type="button" data-test="sweep" title="Runs the quality-tier sweep from the Sweep tab (needs the game's URL)">
+              <svg class="icon"><use href="#i-layers"/></svg><b>Sweep</b><small>quality tiers</small></button>
+            <button class="quick" type="button" data-test="explore" title="The full engine: plays the app with the remote, shrinks what it finds and writes a report">
+              <svg class="icon"><use href="#i-radar"/></svg><b>Explore</b><small>deep · <span data-q="explore-min">10</span> min</small></button>
+            <button class="quick" type="button" data-test="gpu" title="Reloads the app with WebGL limited to the picked Fire TV model's GPU and lists the WebGL calls that fail">
+              <svg class="icon"><use href="#i-chip"/></svg><b>GPU check</b><small data-q="gpu-short">pick a model</small></button>
+          </div>
+          <label class="field">
+            <span class="field-label">GPU emulation</span>
+            <select class="input" id="gpu-model"><option value="">loading models…</option></select>
+          </label>
+          <p class="hint gpu-note"><svg class="icon"><use href="#i-info"/></svg>Copies the GPU's WebGL features and limits, not its speed. Used by GPU check, and by Explore when “also for Explore” is on.</p>
+          <label class="check"><input type="checkbox" id="gpu-for-explore"><span>Also for Explore and Navigation</span></label>
+          <details class="quick-opts">
+            <summary>Durations</summary>
+            <div class="field-grid field-grid-3">
+              <label class="field"><span class="field-label">Navigation min</span><input class="input input-num" id="q-nav-min" type="number" min="1" max="30" value="3"></label>
+              <label class="field"><span class="field-label">Explore min</span><input class="input input-num" id="q-explore-min" type="number" min="1" max="240" value="10"></label>
+              <label class="field"><span class="field-label">Measure s</span><input class="input input-num" id="q-perf-s" type="number" min="5" max="120" value="15"></label>
+            </div>
+            <p class="hint">Performance uses the target fps from the Performance panel.</p>
+          </details>
+        </div>
+
+        <div class="engine-pane" role="tabpanel" id="epane-custom" aria-labelledby="etab-custom" hidden>
+          <form class="custom-form" id="custom-form" autocomplete="off" novalidate>
+            <div class="field-grid field-grid-2">
+              <label class="field"><span class="field-label">Budget</span>
+                <select class="input" name="budgetKind"><option value="minutes">minutes</option><option value="steps">steps</option></select></label>
+              <label class="field"><span class="field-label">Amount</span><input class="input input-num" name="budget" type="number" min="1" value="5"></label>
+              <label class="field"><span class="field-label">Seed</span><input class="input input-num" name="seed" type="number" value="1"></label>
+              <label class="field"><span class="field-label">Strategy</span>
+                <select class="input" name="strategy"><option value="explore">explore</option><option value="random">random (monkey)</option></select></label>
+            </div>
+            <label class="field"><span class="field-label">Keys</span><input class="input input-mono" name="keys" placeholder="default: up down left right ok back menu playpause" spellcheck="false"></label>
+            <label class="field"><span class="field-label">State expression</span><input class="input input-mono" name="stateExpr" placeholder="({ mode: game.mode })" spellcheck="false"></label>
+            <label class="field"><span class="field-label">Focus selector</span><input class="input input-mono" name="focusSelector" placeholder=".focused" spellcheck="false"></label>
+            <label class="field"><span class="field-label">Emulate GPU</span><select class="input" name="emulateGpu" id="custom-gpu"><option value="">no (the device's own GPU)</option></select></label>
+            <label class="field"><span class="field-label">Fail on</span><input class="input input-mono" name="failOn" value="critical major" spellcheck="false" title="Severities (critical, major, minor), categories (crash, focus, black, frozen, js, gpu…) or exact finding kinds"></label>
+            <label class="check"><input type="checkbox" name="minimize" checked><span>Shrink findings afterwards</span></label>
+            <label class="check" title="Lantern Lake, a simulated TV game with 6 seeded bugs that runs inside FireLab"><input type="checkbox" name="demo"><span>Demo game (no device needed)</span></label>
+            <p class="form-error" id="custom-error" role="alert" hidden></p>
+            <button class="btn btn-primary" type="submit"><svg class="icon"><use href="#i-play"/></svg>Run explore</button>
+          </form>
+        </div>
+
+        <div class="engine-pane" role="tabpanel" id="epane-scen" aria-labelledby="etab-scen" hidden>
+          <ul class="mini-scen" id="engine-scen"></ul>
+          <a class="btn btn-ghost btn-sm" href="#page=scenarios"><svg class="icon"><use href="#i-list"/></svg>All scenarios</a>
+        </div>
+      </section>
+    </div>
+    <details class="rail-help" id="rail-help">
+      <summary><svg class="icon"><use href="#i-help"/></svg>Set up a Fire TV for testing</summary>
+      <ol class="steps steps-compact">
+        <li><b>Settings → My Fire TV → About</b>, then select the device name <b>7 times</b> until it says you're a developer.</li>
+        <li><b>Settings → My Fire TV → Developer options → ADB debugging</b>: On.</li>
+        <li>Scan Wi-Fi here (or type the TV's IP), then pick <b>Allow</b> on the TV's “Allow USB debugging?” prompt. Tick “Always allow”.</li>
+      </ol>
+      <p class="hint">Android TV / Google TV: Settings → System → About → press Build 7 times, then Developer options → USB debugging (and Wireless debugging on Android 11+).</p>
+    </details>
+    <footer class="rail-foot">
+      <span>FireLab <span id="app-version">dev</span></span>
+      <span class="sep">·</span><span>MIT</span>
+      <span class="sep">·</span><span id="mock-flag" hidden>mock server</span>
+    </footer>
+  </aside>
+
+  <!-- ============================================================ main -->
+  <main class="main" id="main">
+    <!-- ---------------------------------------------------- stage: TV + remote -->
+    <section class="stage card" id="stage" aria-label="Live device">
+      <div class="tv-wrap">
+        <div class="tv" id="tv">
+          <div class="tv-screen" id="screen" tabindex="0" role="application"
+               aria-roledescription="TV screen" aria-label="Live TV screen. Click or focus to control the TV with your keyboard."
+               aria-describedby="focus-hint">
+            <img class="screen-img" id="screen-img" alt="" draggable="false" hidden>
+            <div class="screen-bars" id="screen-bars" aria-hidden="true">
+              <div class="bars-top"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="bars-mid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="bars-low"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="screen-keyflash" id="screen-keyflash" aria-hidden="true"></div>
+            <div class="screen-overlay" id="screen-overlay"></div>
+            <div class="screen-focus-hint" id="focus-hint"><svg class="icon"><use href="#i-keyboard"/></svg><span>Click the screen to drive the TV with your keyboard</span></div>
+          </div>
+          <div class="tv-chin" aria-hidden="true">
+            <span class="chin-l"><span class="tally" id="hud-tally"></span><span id="hud-name">no device</span></span>
+            <span class="tv-logo">firelab</span>
+            <span class="chin-r"><span id="hud-time">--:--:--</span><span class="tv-led" id="tv-led"></span></span>
+          </div>
+        </div>
+        <div class="tv-stand" aria-hidden="true"></div>
+      </div>
+
+      <div class="remote" id="remote" role="group" aria-label="Virtual remote">
+        <span class="remote-ir" aria-hidden="true"></span>
+        <div class="remote-top">
+          <button class="rbtn rbtn-sm rbtn-power" type="button" data-action="wake" aria-label="Wake the TV" data-tip="Wake · W"><svg class="icon"><use href="#i-power"/></svg></button>
+          <span class="remote-led" id="remote-led" aria-hidden="true"></span>
+          <button class="rbtn rbtn-voice" type="button" data-key="search" aria-label="Search" data-tip="Search · /"><svg class="icon"><use href="#i-search"/></svg></button>
+        </div>
+        <div class="dpad">
+          <button class="dpad-seg dpad-up" type="button" data-key="up" aria-label="Up" data-tip="Up · ↑"><span class="chev"></span></button>
+          <button class="dpad-seg dpad-right" type="button" data-key="right" aria-label="Right" data-tip="Right · →"><span class="chev"></span></button>
+          <button class="dpad-seg dpad-down" type="button" data-key="down" aria-label="Down" data-tip="Down · ↓"><span class="chev"></span></button>
+          <button class="dpad-seg dpad-left" type="button" data-key="left" aria-label="Left" data-tip="Left · ←"><span class="chev"></span></button>
+          <button class="dpad-ok" type="button" data-key="ok" aria-label="OK (select)" data-tip="OK · Enter"><span>OK</span></button>
+        </div>
+        <div class="remote-row">
+          <button class="rbtn" type="button" data-key="back" aria-label="Back" data-tip="Back · Esc / ⌫"><svg class="icon"><use href="#i-back"/></svg></button>
+          <button class="rbtn" type="button" data-key="home" aria-label="Home" data-tip="Home · H"><svg class="icon"><use href="#i-home"/></svg></button>
+          <button class="rbtn" type="button" data-key="menu" aria-label="Menu" data-tip="Menu · M"><svg class="icon"><use href="#i-menu"/></svg></button>
+        </div>
+        <div class="remote-row">
+          <button class="rbtn" type="button" data-key="rewind" aria-label="Rewind" data-tip="Rewind · ,"><svg class="icon"><use href="#i-rewind"/></svg></button>
+          <button class="rbtn" type="button" data-key="playpause" aria-label="Play or pause" data-tip="Play/Pause · Space"><svg class="icon"><use href="#i-playpause"/></svg></button>
+          <button class="rbtn" type="button" data-key="fastforward" aria-label="Fast forward" data-tip="Fast forward · ."><svg class="icon"><use href="#i-ff"/></svg></button>
+        </div>
+        <div class="vol-rocker" role="group" aria-label="Volume">
+          <button class="vol-key" type="button" data-key="voldown" aria-label="Volume down" data-tip="Volume down · −"><svg class="icon"><use href="#i-voldown"/></svg></button>
+          <button class="vol-key vol-mute" type="button" data-key="mute" aria-label="Mute" data-tip="Mute · 0"><svg class="icon"><use href="#i-mute"/></svg></button>
+          <button class="vol-key" type="button" data-key="volup" aria-label="Volume up" data-tip="Volume up · +"><svg class="icon"><use href="#i-volup"/></svg></button>
+        </div>
+        <div class="remote-brand" aria-hidden="true"><img src="logo.png" alt="" width="16" height="16"><span>fire<b>lab</b></span></div>
+        <div class="remote-hold" id="remote-hold" aria-hidden="true">hold = long press</div>
+      </div>
+
+      <div class="mirror-bar" id="mirror-bar">
+        <span class="mirror-live" id="mirror-live"><span class="tally"></span><span id="mirror-status">Offline</span></span>
+        <span class="mirror-stat" id="mirror-rate" title="Screen mirror rate and round-trip time">—</span>
+        <span class="mirror-fg" id="mirror-fg" title="Foreground app"></span>
+        <span class="spacer"></span>
+        <button class="icon-btn icon-btn-sm" type="button" id="mirror-pause" aria-pressed="false" title="Pause the mirror" aria-label="Pause the mirror"><svg class="icon"><use href="#i-pause"/></svg></button>
+        <label class="mini-select" title="Mirror resolution">
+          <span class="sr-only">Mirror resolution</span>
+          <select id="mirror-quality">
+            <option value="640">640p</option>
+            <option value="960" selected>960p</option>
+            <option value="1280">1280p</option>
+          </select>
+        </label>
+        <button class="icon-btn icon-btn-sm" type="button" id="mirror-shot" title="Download a full-size screenshot" aria-label="Download screenshot"><svg class="icon"><use href="#i-camera"/></svg></button>
+        <button class="icon-btn icon-btn-sm" type="button" id="mirror-full" title="Full screen" aria-label="Full screen"><svg class="icon"><use href="#i-max"/></svg></button>
+      </div>
+
+      <form class="type-box" id="type-box" autocomplete="off">
+        <label class="sr-only" for="type-input">Type text on the TV</label>
+        <input class="input" id="type-input" placeholder="Type on the TV…" spellcheck="false" enterkeyhint="send">
+        <button class="icon-btn icon-btn-sm" type="submit" aria-label="Send text to the TV" title="Send text (Enter)"><svg class="icon"><use href="#i-enter"/></svg></button>
+      </form>
+    </section>
+
+    <!-- ---------------------------------------------------- performance -->
+    <section class="perf card" id="perf" aria-labelledby="perf-title">
+      <header class="panel-head">
+        <h2 class="panel-title" id="perf-title"><svg class="icon"><use href="#i-activity"/></svg>Performance</h2>
+        <span class="source-badge" id="perf-source" hidden></span>
+        <span class="spacer"></span>
+        <button class="icon-btn" type="button" id="perf-expand" title="Expand the charts" aria-label="Expand the performance charts"><svg class="icon"><use href="#i-max"/></svg></button>
+        <label class="mini-select" title="Target frame rate">
+          <span>target</span>
+          <select id="perf-target"><option value="24">24</option><option value="30" selected>30</option><option value="45">45</option><option value="60">60</option></select>
+        </label>
+      </header>
+      <div class="perf-body" id="perf-body">
+        <div class="meter meter-fps">
+          <div class="meter-read">
+            <div class="readout">
+              <span class="readout-val" id="r-fps">—</span><span class="readout-unit">fps</span>
+            </div>
+            <span class="fps-status" id="fps-status" hidden></span>
+          </div>
+          <dl class="meter-stats">
+            <div title="Median fps over the last 2 minutes"><dt>median</dt><dd id="r-median">—</dd></div>
+            <div title="10th percentile fps over the last 2 minutes: the slow moments"><dt>p10</dt><dd id="r-p10">—</dd></div>
+            <div title="Lowest fps in the last 2 minutes"><dt>min</dt><dd id="r-min">—</dd></div>
+          </dl>
+          <div class="chart chart-fps" id="chart-fps"><canvas aria-label="Frames per second, last 2 minutes" role="img"></canvas></div>
+        </div>
+        <div class="perf-tiles">
+          <div class="tile" data-metric="cpu" title="CPU use of the app, % of one core">
+            <div class="tile-label"><span class="key key-cpu"></span>CPU</div>
+            <div class="tile-value"><span id="r-cpu">—</span><small>%</small></div>
+            <div class="tile-note" id="n-cpu"></div>
+            <div class="chart chart-tile" id="chart-cpu"><canvas aria-label="CPU percent" role="img"></canvas></div>
+          </div>
+          <div class="tile" data-metric="mem" title="The app’s memory (PSS: app + WebView renderer)">
+            <div class="tile-label"><span class="key key-mem"></span>Memory</div>
+            <div class="tile-value"><span id="r-mem">—</span><small>MB</small></div>
+            <div class="tile-note" id="n-mem"></div>
+            <div class="chart chart-tile" id="chart-mem"><canvas aria-label="Memory in MB" role="img"></canvas></div>
+          </div>
+          <div class="tile" data-metric="frame" title="Time per frame: measured by @firelab/perf (window.firelab.frameMs) when the page has it, else 1000 / fps (marked est.)">
+            <div class="tile-label"><span class="key key-frame"></span>Frame time</div>
+            <div class="tile-value"><span id="r-frame">—</span><small>ms</small></div>
+            <div class="tile-note" id="n-frame"></div>
+            <div class="chart chart-tile" id="chart-frame"><canvas aria-label="Frame time in ms" role="img"></canvas></div>
+          </div>
+          <div class="tile" data-metric="scale" title="Render scale chosen by adaptive resolution (@firelab/perf)">
+            <div class="tile-label"><span class="key key-scale"></span>Scale</div>
+            <div class="tile-value"><span id="r-scale">—</span><small></small></div>
+            <div class="tile-note" id="n-scale"></div>
+            <div class="chart chart-tile" id="chart-scale"><canvas aria-label="Render scale" role="img"></canvas></div>
+          </div>
+          <div class="tile" data-metric="net" title="Download rate of the TV’s Wi-Fi/Ethernet from /proc/net/dev (upload in the note)">
+            <div class="tile-label"><span class="key key-net"></span>Network</div>
+            <div class="tile-value"><span id="r-net">—</span><small>Mbps</small></div>
+            <div class="tile-note" id="n-net"></div>
+            <div class="chart chart-tile" id="chart-net"><canvas aria-label="Network download in Mbps" role="img"></canvas></div>
+          </div>
+          <div class="tile" data-metric="temp" title="CPU/SoC temperature from the TV’s thermal HAL or thermal zones">
+            <div class="tile-label"><span class="key key-temp"></span>Device temp</div>
+            <div class="tile-value"><span id="r-temp">—</span><small>°C</small></div>
+            <div class="tile-note" id="n-temp"></div>
+            <div class="chart chart-tile" id="chart-temp"><canvas aria-label="Device temperature" role="img"></canvas></div>
+          </div>
+        </div>
+        <div class="perf-empty" id="perf-empty" hidden></div>
+      </div>
+      <footer class="perf-foot"><span id="perf-window">last 2 min</span><span class="spacer"></span><span id="perf-gpu"></span></footer>
+    </section>
+
+    <!-- ---------------------------------------------------- bottom: tools dock, test execution, test results -->
+    <div class="bottom" id="bottom">
+    <section class="dock card" id="dock" aria-label="Tools">
+      <div class="dock-tabs" role="tablist" aria-label="Tools">
+        <button class="tab" role="tab" id="tab-console" aria-controls="pane-console" aria-selected="true" type="button"><svg class="icon"><use href="#i-terminal"/></svg>Console<span class="tab-badge" id="badge-console" hidden></span></button>
+        <button class="tab" role="tab" id="tab-keys" aria-controls="pane-keys" aria-selected="false" tabindex="-1" type="button"><svg class="icon"><use href="#i-remote"/></svg>Key log<span class="tab-badge tab-badge-quiet" id="badge-keys" hidden></span></button>
+        <button class="tab" role="tab" id="tab-apps" aria-controls="pane-apps" aria-selected="false" tabindex="-1" type="button"><svg class="icon"><use href="#i-apps"/></svg>Apps</button>
+        <button class="tab" role="tab" id="tab-sweep" aria-controls="pane-sweep" aria-selected="false" tabindex="-1" type="button"><svg class="icon"><use href="#i-flask"/></svg>Sweep<span class="tab-dot" id="dot-sweep" hidden></span></button>
+        <button class="tab" role="tab" id="tab-watch" aria-controls="pane-watch" aria-selected="false" tabindex="-1" type="button"><svg class="icon"><use href="#i-eye"/></svg>Watch<span class="tab-dot tab-dot-rec" id="dot-watch" hidden></span></button>
+      </div>
+
+      <div class="dock-panes">
+        <!-- console -->
+        <div class="pane pane-console" role="tabpanel" id="pane-console" aria-labelledby="tab-console">
+          <div class="console-moved pane-empty" id="console-moved" hidden><svg class="icon"><use href="#i-terminal"/></svg><b>The console is open on the Logs page</b><a class="btn btn-sm" href="#page=logs">Go to Logs</a></div>
+          <div class="console-body" id="console-body">
+          <div class="toolbar">
+            <div class="seg" role="group" aria-label="Log levels" id="log-levels">
+              <button class="seg-btn lvl-log" type="button" data-level="log" aria-pressed="true">log<span class="n">0</span></button>
+              <button class="seg-btn lvl-info" type="button" data-level="info" aria-pressed="true">info<span class="n">0</span></button>
+              <button class="seg-btn lvl-warn" type="button" data-level="warn" aria-pressed="true">warn<span class="n">0</span></button>
+              <button class="seg-btn lvl-error" type="button" data-level="error" aria-pressed="true">error<span class="n">0</span></button>
+            </div>
+            <div class="seg" role="group" aria-label="Log sources" id="log-sources">
+              <button class="seg-btn" type="button" data-source="console" aria-pressed="true" title="console.* from the page">page</button>
+              <button class="seg-btn" type="button" data-source="exception" aria-pressed="true" title="Uncaught exceptions">exceptions</button>
+              <button class="seg-btn" type="button" data-source="logcat" aria-pressed="true" title="Android logcat">logcat</button>
+            </div>
+            <label class="search">
+              <svg class="icon"><use href="#i-search"/></svg>
+              <span class="sr-only">Filter logs</span>
+              <input type="search" id="log-search" placeholder="Filter…" spellcheck="false">
+            </label>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost btn-sm" type="button" id="log-autoscroll" aria-pressed="true" title="Follow new lines"><svg class="icon"><use href="#i-autoscroll"/></svg>Follow</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="log-copy" title="Copy the visible lines"><svg class="icon"><use href="#i-copy"/></svg>Copy</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="log-download" title="Download the visible lines as a .log file"><svg class="icon"><use href="#i-download"/></svg>Download</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="log-clear" title="Clear the console"><svg class="icon"><use href="#i-trash"/></svg>Clear</button>
+          </div>
+          <div class="log-wrap">
+            <div class="log-list" id="log-list" role="log" aria-label="Device console" tabindex="0"></div>
+            <button class="jump-new" type="button" id="log-jump" hidden></button>
+          </div>
+          </div>
+        </div>
+
+        <!-- key log -->
+        <div class="pane pane-keys" role="tabpanel" id="pane-keys" aria-labelledby="tab-keys" hidden>
+          <div class="toolbar">
+            <span class="legend"><span class="sw sw-remote"></span>physical remote</span>
+            <span class="legend"><span class="sw sw-dash"></span>this dashboard</span>
+            <span class="toolbar-note" id="keys-rate"></span>
+            <span class="spacer"></span>
+            <button class="btn btn-ghost btn-sm" type="button" id="keys-copy" title="Copy the physical-remote presses as a keys array for /keys or press_keys"><svg class="icon"><use href="#i-copy"/></svg>Copy as keys</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="keys-replay" title="Send the last physical-remote sequence to the TV again"><svg class="icon"><use href="#i-replay"/></svg>Replay</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="keys-clear"><svg class="icon"><use href="#i-trash"/></svg>Clear</button>
+          </div>
+          <div class="timeline" id="keys-timeline"><canvas role="img" aria-label="Remote key presses, last 60 seconds"></canvas></div>
+          <ol class="key-list" id="key-list" aria-label="Recent key presses"></ol>
+        </div>
+
+        <!-- apps -->
+        <div class="pane pane-apps" role="tabpanel" id="pane-apps" aria-labelledby="tab-apps" hidden>
+          <div class="apps-col">
+            <div class="toolbar">
+              <h3 class="label">Installed apps <span class="count" id="apps-count">0</span></h3>
+              <span class="spacer"></span>
+              <button class="icon-btn icon-btn-sm" type="button" id="apps-refresh" aria-label="Refresh apps" title="Refresh"><svg class="icon"><use href="#i-refresh"/></svg></button>
+            </div>
+            <label class="field field-inline">
+              <span class="field-label">Open URL</span>
+              <input class="input input-mono" id="launch-url" placeholder="optional, e.g. https://game.example.com/?q=tv" spellcheck="false">
+            </label>
+            <ul class="app-list" id="app-list" aria-label="Installed apps"></ul>
+            <form class="install-form" id="install-form" autocomplete="off">
+              <label class="sr-only" for="apk-path">APK path on this computer</label>
+              <input class="input input-mono" id="apk-path" placeholder="/path/to/app-release.apk" spellcheck="false">
+              <button class="btn btn-sm" type="submit"><svg class="icon"><use href="#i-package"/></svg>Install APK</button>
+            </form>
+          </div>
+          <div class="eval-col">
+            <div class="toolbar">
+              <h3 class="label">WebView eval</h3>
+              <label class="mini-select" title="Which app's WebView to evaluate in">
+                <span>in</span>
+                <select id="eval-pkg"><option value="">foreground app</option></select>
+              </label>
+              <span class="spacer"></span>
+              <span class="toolbar-note">read-only expressions are safest</span>
+            </div>
+            <div class="snippets" id="eval-snippets"></div>
+            <div class="eval-editor">
+              <label class="sr-only" for="eval-expr">JavaScript expression</label>
+              <textarea class="input input-mono" id="eval-expr" rows="3" spellcheck="false" placeholder="window.firelab"></textarea>
+              <button class="btn btn-primary btn-sm eval-run" type="button" id="eval-run" title="Run (⌘/Ctrl + Enter)"><svg class="icon"><use href="#i-play"/></svg>Run<kbd>⌘↵</kbd></button>
+            </div>
+            <div class="eval-out-wrap">
+              <pre class="eval-out" id="eval-out" aria-live="polite"><span class="muted">Results show here. ↑ / ↓ in the editor walks your history.</span></pre>
+              <ul class="eval-history" id="eval-history" aria-label="History"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- sweep -->
+        <div class="pane pane-sweep" role="tabpanel" id="pane-sweep" aria-labelledby="tab-sweep" hidden>
+          <form class="sweep-form" id="sweep-form" autocomplete="off" novalidate>
+            <label class="field">
+              <span class="field-label">Game URL</span>
+              <input class="input input-mono" name="url" id="sweep-url" placeholder="https://game.example.com/play/" spellcheck="false" required>
+            </label>
+            <fieldset class="field">
+              <legend class="field-label">Tiers to test</legend>
+              <div class="tier-chips" id="sweep-tiers"></div>
+            </fieldset>
+            <div class="field-grid">
+              <label class="field" title="URL parameter that selects the tier, e.g. ?q=tv"><span class="field-label">Param</span><input class="input input-mono" name="param" value="q" spellcheck="false"></label>
+              <label class="field" title="Target frame rate in fps"><span class="field-label">Target</span><input class="input input-num" name="targetFps" type="number" min="10" max="120" value="30"></label>
+              <label class="field" title="Seconds to let each tier settle before sampling"><span class="field-label">Warm-up s</span><input class="input input-num" name="warmupS" type="number" min="0" max="120" value="5"></label>
+              <label class="field" title="Seconds of frame rate to sample per tier"><span class="field-label">Sample s</span><input class="input input-num" name="sampleS" type="number" min="3" max="300" value="10"></label>
+            </div>
+            <details class="field-more">
+              <summary>While sampling <span class="muted">(optional)</span></summary>
+              <label class="field"><span class="field-label">Press keys</span><input class="input input-mono" name="keys" placeholder="right right ok" spellcheck="false"></label>
+              <label class="field"><span class="field-label">Run in page</span><input class="input input-mono" name="eval" placeholder="game.startDemoLap()" spellcheck="false"></label>
+              <label class="field"><span class="field-label">App package</span><select class="input" name="package" id="sweep-pkg"><option value="">FireLab default WebView</option></select></label>
+            </details>
+            <div class="sweep-actions">
+              <button class="btn btn-primary" type="submit" id="sweep-run"><svg class="icon"><use href="#i-flask"/></svg>Run sweep</button>
+              <span class="hint" id="sweep-estimate"></span>
+            </div>
+            <p class="form-error" id="sweep-error" role="alert" hidden></p>
+          </form>
+          <div class="sweep-result" id="sweep-result" aria-live="polite"></div>
+        </div>
+
+        <!-- watch -->
+        <div class="pane pane-watch" role="tabpanel" id="pane-watch" aria-labelledby="tab-watch" hidden>
+          <div class="watch-ctl" id="watch-ctl">
+            <div class="rec-card" id="rec-card">
+              <button class="rec-btn" type="button" id="rec-btn" aria-pressed="false"><span class="rec-dot"></span><span class="rec-label">Start watching</span></button>
+              <div class="rec-meta">
+                <div class="rec-time" id="rec-time">00:00</div>
+                <div class="rec-sub" id="rec-sub">Records remote presses, fps, memory, errors and a thumbnail strip while someone plays.</div>
+              </div>
+            </div>
+            <div class="rec-stats" id="rec-stats">
+              <div><span>keys</span><b id="rec-keys">0</b></div>
+              <div><span>fps now</span><b id="rec-fps">—</b></div>
+              <div><span>max mem</span><b id="rec-mem">—</b></div>
+              <div><span>errors</span><b id="rec-errors">0</b></div>
+            </div>
+            <div class="field-grid field-grid-2">
+              <label class="field"><span class="field-label">App</span><select class="input" id="watch-pkg"><option value="">foreground app</option></select></label>
+              <label class="field"><span class="field-label">Thumbnail every</span>
+                <select class="input" id="watch-interval"><option value="2000">2 s</option><option value="5000" selected>5 s</option><option value="10000">10 s</option><option value="30000">30 s</option></select></label>
+            </div>
+          </div>
+          <div class="sessions">
+            <div class="toolbar">
+              <h3 class="label">Sessions <span class="count" id="sessions-count">0</span></h3>
+              <span class="spacer"></span>
+              <button class="icon-btn icon-btn-sm" type="button" id="sessions-refresh" aria-label="Refresh sessions" title="Refresh"><svg class="icon"><use href="#i-refresh"/></svg></button>
+            </div>
+            <ul class="session-list" id="session-list"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exec card" id="exec" aria-labelledby="exec-title">
+      <header class="panel-head">
+        <h2 class="panel-title" id="exec-title"><svg class="icon"><use href="#i-play"/></svg>Test Execution</h2>
+        <span class="spacer"></span>
+        <button class="btn btn-sm btn-ghost" type="button" id="exec-stop" hidden><svg class="icon"><use href="#i-stop"/></svg>Stop</button>
+      </header>
+      <div class="exec-body" id="exec-body" aria-live="polite"></div>
+    </section>
+
+    <section class="results card" id="results" aria-labelledby="results-title">
+      <header class="panel-head">
+        <h2 class="panel-title" id="results-title"><svg class="icon"><use href="#i-check"/></svg>Test Results</h2>
+        <span class="panel-sub">last 24 h</span>
+        <span class="spacer"></span>
+        <a class="btn btn-sm btn-ghost" href="#page=tests">All</a>
+      </header>
+      <div class="results-body" id="results-body"></div>
+    </section>
+    </div>
+  </main>
+
+  <!-- ============================================================ tests page -->
+  <section class="page" id="page-tests" aria-labelledby="tests-title" hidden>
+    <header class="page-head">
+      <div>
+        <h1 class="page-title" id="tests-title">Tests</h1>
+        <p class="page-sub">Every engine run on this computer (<code>~/.firelab/explore</code>) and the dashboard's test jobs.</p>
+      </div>
+      <span class="spacer"></span>
+      <label class="mini-select page-device-wrap"><span>re-run on</span><select class="page-device" aria-label="Device for re-runs"></select></label>
+      <button class="icon-btn" type="button" data-refresh="tests" aria-label="Refresh" title="Refresh"><svg class="icon"><use href="#i-refresh"/></svg></button>
+    </header>
+    <div class="totals" id="tests-totals"></div>
+    <section class="card page-card">
+      <div class="toolbar">
+        <h2 class="label">Engine runs <span class="count" id="runs-count">0</span></h2>
+        <label class="search"><svg class="icon"><use href="#i-search"/></svg><span class="sr-only">Filter runs</span><input type="search" id="runs-search" placeholder="Filter by app, device, run…" spellcheck="false"></label>
+        <label class="check"><input type="checkbox" id="runs-demo" checked><span>demo runs</span></label>
+      </div>
+      <div class="table-wrap" id="runs-table"></div>
+    </section>
+    <section class="card page-card">
+      <div class="toolbar"><h2 class="label">Test jobs <span class="count" id="jobs-count">0</span></h2><span class="toolbar-note">app launch, performance, GPU, replay… (kept in ~/.firelab/tests)</span></div>
+      <div class="table-wrap" id="jobs-table"></div>
+    </section>
+  </section>
+
+  <!-- ============================================================ scenarios page -->
+  <section class="page" id="page-scenarios" aria-labelledby="scen-title" hidden>
+    <header class="page-head">
+      <div>
+        <h1 class="page-title" id="scen-title">Scenarios</h1>
+        <p class="page-sub">Key sequences you can play again: the shortest repro of each engine finding, and what people did in watch sessions.</p>
+      </div>
+      <span class="spacer"></span>
+      <label class="mini-select page-device-wrap"><span>replay on</span><select class="page-device" aria-label="Device for replays"></select></label>
+      <button class="icon-btn" type="button" data-refresh="scenarios" aria-label="Refresh" title="Refresh"><svg class="icon"><use href="#i-refresh"/></svg></button>
+    </header>
+    <section class="card page-card">
+      <div class="toolbar"><h2 class="label">Finding traces <span class="count" id="traces-count">0</span></h2><span class="toolbar-note">replay = relaunch the app, press the keys with the recorded gaps, check whether the finding shows again</span></div>
+      <div class="scen-list" id="traces-list"></div>
+    </section>
+    <section class="card page-card">
+      <div class="toolbar"><h2 class="label">Watch sessions <span class="count" id="wsessions-count">0</span></h2><span class="toolbar-note">recorded with Watch on the Devices page</span></div>
+      <div class="scen-list" id="wsessions-list"></div>
+    </section>
+  </section>
+
+  <!-- ============================================================ logs page -->
+  <section class="page page-logs" id="page-logs" aria-labelledby="logs-title" hidden>
+    <header class="page-head">
+      <div>
+        <h1 class="page-title" id="logs-title">Logs</h1>
+        <p class="page-sub">The app's console, uncaught exceptions and its warning/error logcat lines, live from the selected device.</p>
+      </div>
+      <span class="spacer"></span>
+      <label class="mini-select page-device-wrap"><span>device</span><select class="page-device" aria-label="Device"></select></label>
+    </header>
+    <section class="card page-card logs-card pane-console" id="logs-host" aria-label="Device console"></section>
+  </section>
+
+  <!-- ============================================================ reports page -->
+  <section class="page" id="page-reports" aria-labelledby="reports-title" hidden>
+    <header class="page-head">
+      <div>
+        <h1 class="page-title" id="reports-title">Reports</h1>
+        <p class="page-sub">Engine reports (<code>report.html</code> in each run) and benchmark reports (<code>~/.firelab/bench</code>). They open in a new tab.</p>
+      </div>
+      <span class="spacer"></span>
+      <button class="icon-btn" type="button" data-refresh="reports" aria-label="Refresh" title="Refresh"><svg class="icon"><use href="#i-refresh"/></svg></button>
+    </header>
+    <section class="card page-card">
+      <div class="toolbar"><h2 class="label">Benchmarks <span class="count" id="bench-count">0</span></h2></div>
+      <div class="report-grid" id="reports-bench"></div>
+    </section>
+    <section class="card page-card">
+      <div class="toolbar"><h2 class="label">Engine reports <span class="count" id="ereports-count">0</span></h2></div>
+      <div class="report-grid" id="reports-engine"></div>
+    </section>
+  </section>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<dialog class="dialog dialog-perf" id="perf-dialog" aria-labelledby="perf-dialog-title">
+  <header class="dialog-head">
+    <h2 id="perf-dialog-title"><svg class="icon"><use href="#i-activity"/></svg>Performance <span class="perf-dialog-dev" id="perf-dialog-dev"></span></h2>
+    <span class="spacer"></span>
+    <label class="mini-select" title="How much history to show">
+      <span>window</span>
+      <select id="perf-dialog-window"><option value="60000">1 min</option><option value="120000" selected>2 min</option><option value="300000">5 min</option></select>
+    </label>
+    <button class="icon-btn" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  </header>
+  <div class="perf-big">
+    <section class="perf-big-item perf-big-fps" data-big="fps">
+      <header><span class="key key-fps"></span><b>Frame rate</b><span class="perf-big-now" id="big-now-fps">—</span><small>fps</small><span class="spacer"></span><span class="perf-big-stats" id="big-stats-fps"></span></header>
+      <div class="chart chart-big" id="big-chart-fps"><canvas aria-label="Frames per second" role="img"></canvas></div>
+    </section>
+    <section class="perf-big-item" data-big="mem">
+      <header><span class="key key-mem"></span><b>Memory</b><span class="perf-big-now" id="big-now-mem">—</span><small>MB</small><span class="spacer"></span><span class="perf-big-stats" id="big-stats-mem"></span></header>
+      <div class="chart chart-big" id="big-chart-mem"><canvas aria-label="Memory in MB" role="img"></canvas></div>
+    </section>
+    <section class="perf-big-item" data-big="cpu">
+      <header><span class="key key-cpu"></span><b>CPU</b><span class="perf-big-now" id="big-now-cpu">—</span><small>% of one core</small><span class="spacer"></span><span class="perf-big-stats" id="big-stats-cpu"></span></header>
+      <div class="chart chart-big" id="big-chart-cpu"><canvas aria-label="CPU percent" role="img"></canvas></div>
+    </section>
+    <section class="perf-big-item" data-big="scale">
+      <header><span class="key key-scale"></span><b>Render scale</b><span class="perf-big-now" id="big-now-scale">—</span><span class="spacer"></span><span class="perf-big-stats" id="big-stats-scale"></span></header>
+      <div class="chart chart-big" id="big-chart-scale"><canvas aria-label="Render scale" role="img"></canvas></div>
+    </section>
+  </div>
+  <p class="hint perf-big-hint">Hover a chart for exact values. Esc closes.</p>
+</dialog>
+
+<dialog class="dialog" id="shortcuts-dialog" aria-labelledby="shortcuts-title">
+  <header class="dialog-head">
+    <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+    <button class="icon-btn" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  </header>
+  <p class="hint">Click the TV screen first (it gets a blue outline), then use these keys. Hold a key for a long press. Tab away or click elsewhere to stop.</p>
+  <div class="kbd-grid" id="kbd-grid"></div>
+</dialog>
+
+<dialog class="dialog dialog-lightbox" id="lightbox" aria-label="Thumbnail">
+  <button class="icon-btn lightbox-x" type="button" data-close aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button>
+  <img id="lightbox-img" alt="">
+  <p class="lightbox-cap" id="lightbox-cap"></p>
+</dialog>
+</body>
+</html>

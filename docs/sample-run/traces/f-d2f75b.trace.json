@@ -1,0 +1,305 @@
+{
+ "version": 1,
+ "app": {
+  "package": "dev.firelab.fireflylake",
+  "url": "http://192.168.1.164:8080/examples/web-game/?bugs=all"
+ },
+ "device": {
+  "serial": "192.168.1.194:5555",
+  "model": "AFTMA08C15",
+  "name": "Fire TV Stick 4K Plus",
+  "tier": "tv-hd"
+ },
+ "createdAt": 1792138204099,
+ "seed": 1,
+ "setup": [
+  {
+   "kind": "relaunch"
+  }
+ ],
+ "steps": [
+  {
+   "i": 0,
+   "action": {
+    "kind": "key",
+    "key": "fastforward"
+   },
+   "gapMs": 0,
+   "stateId": "64b2c3752602",
+   "frameHash": "c370f0e0c61763c5"
+  },
+  {
+   "i": 1,
+   "action": {
+    "kind": "key",
+    "key": "ok"
+   },
+   "gapMs": 3629,
+   "stateId": "8c357d491b95",
+   "frameHash": "63f1f0e0c0c1c1c1"
+  },
+  {
+   "i": 2,
+   "action": {
+    "kind": "key",
+    "key": "left"
+   },
+   "gapMs": 3100,
+   "stateId": "8c357d491b95",
+   "frameHash": "6370f0e0c0e7c76f"
+  },
+  {
+   "i": 3,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 2612,
+   "stateId": "8c357d491b95",
+   "frameHash": "6370f0e0e0e1c1c1"
+  },
+  {
+   "i": 4,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 2668,
+   "stateId": "8c357d491b95",
+   "frameHash": "6370f0e8c451e3c7"
+  },
+  {
+   "i": 5,
+   "action": {
+    "kind": "key",
+    "key": "rewind"
+   },
+   "gapMs": 2650,
+   "stateId": "912781454df8",
+   "frameHash": "c0f0f0e8c2b082e0"
+  },
+  {
+   "i": 6,
+   "action": {
+    "kind": "key",
+    "key": "down"
+   },
+   "gapMs": 4408,
+   "stateId": "912781454df8",
+   "frameHash": "c0f0f0e8e0b0e0e0"
+  },
+  {
+   "i": 7,
+   "action": {
+    "kind": "key",
+    "key": "up"
+   },
+   "gapMs": 3021,
+   "stateId": "912781454df8",
+   "frameHash": "c0f0f0e8c0b0e9eb"
+  },
+  {
+   "i": 8,
+   "action": {
+    "kind": "key",
+    "key": "right"
+   },
+   "gapMs": 3071,
+   "stateId": "912781454df8",
+   "frameHash": "c0f0f0e8e0b0e0e0"
+  },
+  {
+   "i": 9,
+   "action": {
+    "kind": "key",
+    "key": "back"
+   },
+   "gapMs": 2821,
+   "stateId": "EXIT",
+   "frameHash": "81f385e58d8cd5f0"
+  }
+ ],
+ "expect": {
+  "oracle": "health",
+  "signature": "unexpected-exit:912781454df8:back"
+ },
+ "probe": {
+  "stateExpr": "demo.ui",
+  "focusSelector": "#menu-list li.focused"
+ },
+ "startStateId": "64b2c3752602",
+ "shortcuts": [
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "rewind"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2821,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "rewind"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 3071,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8e0b0e0e0"
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2821,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "rewind"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3021,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8c0b0e9eb"
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 3071,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8e0b0e0e0"
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2821,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ],
+  [
+   {
+    "i": 0,
+    "action": {
+     "kind": "key",
+     "key": "playpause"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 1,
+    "action": {
+     "kind": "key",
+     "key": "rewind"
+    },
+    "gapMs": 3000
+   },
+   {
+    "i": 2,
+    "action": {
+     "kind": "key",
+     "key": "down"
+    },
+    "gapMs": 4408,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8e0b0e0e0"
+   },
+   {
+    "i": 3,
+    "action": {
+     "kind": "key",
+     "key": "up"
+    },
+    "gapMs": 3021,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8c0b0e9eb"
+   },
+   {
+    "i": 4,
+    "action": {
+     "kind": "key",
+     "key": "right"
+    },
+    "gapMs": 3071,
+    "stateId": "912781454df8",
+    "frameHash": "c0f0f0e8e0b0e0e0"
+   },
+   {
+    "i": 5,
+    "action": {
+     "kind": "key",
+     "key": "back"
+    },
+    "gapMs": 2821,
+    "stateId": "EXIT",
+    "frameHash": "81f385e58d8cd5f0"
+   }
+  ]
+ ]
+}
