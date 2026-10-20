@@ -1,7 +1,7 @@
 {
   "name": "FireLab (try it, no Fire TV needed)",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-  "postCreateCommand": "npm ci",
+  "postCreateCommand": "npm ci && npm run build",
   "postAttachCommand": {
     "dashboard": "echo 'FireLab dashboard on a simulated TV (port 7310). In another terminal: npm run demo  (the engine finds and shrinks 6 seeded bugs)' && npm run demo:dashboard"
   },

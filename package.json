@@ -36,7 +36,6 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "prepare": "npm run build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run && npm test --workspace packages/perf",
     "test:watch": "vitest",
