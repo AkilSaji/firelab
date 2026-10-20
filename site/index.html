@@ -93,6 +93,7 @@ h1, h2 { font-weight: 500; text-wrap: balance; }
 .btn.go:hover { filter: brightness(1.06); }
 .btn.lg { height: 42px; padding: 0 18px; }
 .btn svg { width: 16px; height: 16px; }
+.try-note { margin: 12px auto 0; max-width: 520px; font-size: 13px; color: var(--ink-3); text-align: center; }
 
 /* hero */
 .hero { position: relative; overflow: hidden; padding-block: 72px 56px; text-align: center; }
@@ -331,9 +332,11 @@ footer a { color: var(--ink-2); }
     <div class="rotor-dots" role="group" aria-label="Headlines"><button type="button" aria-label="Headline 1" aria-current="true"></button><button type="button" aria-label="Headline 2"></button><button type="button" aria-label="Headline 3"></button><button type="button" aria-label="Headline 4"></button><button type="button" aria-label="Headline 5"></button></div>
     <p class="sub">FireLab makes your game see any Fire TV model's GPU, in desktop Chrome, an emulator or the stick you have. Then its engine plays the game with the remote and shrinks every bug to the shortest key sequence. <mark>No Fire TV needed to start.</mark></p>
     <div class="ctas">
-      <a class="btn go lg" href="#start">Get started</a>
+      <a class="btn go lg" href="https://codespaces.new/AkilSaji/firelab?quickstart=1" target="_blank" rel="noopener" title="Opens FireLab in a free GitHub Codespace with a simulated Fire TV game"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5-9-5.5Z"/></svg>Try it in your browser</a>
+      <a class="btn lg" href="#start">Install it</a>
       <a class="btn lg" href="https://github.com/AkilSaji/firelab" target="_blank" rel="noopener">View on GitHub</a>
     </div>
+    <p class="try-note">One click starts FireLab in a GitHub Codespace and opens the dashboard on a simulated TV. Free with a GitHub account, nothing to install.</p>
 
     <div class="cmdbox" role="group" aria-label="Try a command">
       <div class="line"><span>$</span><code id="cmd">firelab explore --package com.example.game --minutes 30</code></div>
@@ -551,10 +554,12 @@ cd firelab &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link
     <h3 style="font-weight:500;font-size:22px;letter-spacing:-0.02em">From clone to first bug in minutes</h3>
     <p style="color:var(--ink-2)">The step-by-step guide covers TV setup, getting your app on the TV, reading the report, performance, every-model checks, emulators and CI.</p>
     <div class="ctas" style="justify-content:flex-start">
-      <a class="btn go" href="https://github.com/AkilSaji/firelab/blob/main/docs/GETTING-STARTED.md" target="_blank" rel="noopener">Read the guide</a>
+      <a class="btn go" href="https://codespaces.new/AkilSaji/firelab?quickstart=1" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5-9-5.5Z"/></svg>Open in Codespaces</a>
+      <a class="btn" href="https://github.com/AkilSaji/firelab/blob/main/docs/GETTING-STARTED.md" target="_blank" rel="noopener">Read the guide</a>
       <a class="btn" href="https://github.com/AkilSaji/firelab/archive/refs/heads/main.zip">Download ZIP</a>
     </div>
-    <div class="cmdline">claude mcp add firelab -- npx -y firelab mcp</div>
+    <p style="color:var(--ink-2);font-size:14px">Add it to Claude Code, no clone needed:</p>
+    <div class="cmdline">claude mcp add firelab -- npx -y github:AkilSaji/firelab mcp</div>
   </div>
 </div>
 
