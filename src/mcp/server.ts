@@ -452,7 +452,7 @@ export function createMcpServer(lab: FireLab): McpServer {
         focusSelector: z.string().optional().describe('CSS selector of the focused control for apps that draw focus with a class, e.g. ".focused".'),
         strategy: z.enum(['explore', 'random']).optional().describe('"random" is the monkey baseline for comparisons.'),
         minimize: z.boolean().optional().describe('Shrink findings afterwards (default true).'),
-        minimizeMinutes: z.number().min(0.5).max(60).optional().describe('Shrink budget per finding (default 20).'),
+        minimizeMinutes: z.number().min(0.5).max(60).optional().describe('Shrink budget per finding, in minutes (default 5).'),
         emulateGpu: z.string().optional().describe('A Fire TV model id (e.g. "AFTSSS"): WebGL in the app reports only that model\'s GPU features and limits (WebGL2, max texture size, extensions, compressed formats, shader precision), not its speed; every WebGL call that fails becomes a gpu-unsupported finding. Useful on the emulator lab, which has the model\'s RAM and screen but not its GPU. Needs a debuggable WebView.'),
         driver: z
           .enum(['adb', 'vda', 'demo'])

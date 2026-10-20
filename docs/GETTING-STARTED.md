@@ -121,10 +121,11 @@ firelab explore --apk build/my-game.apk --minutes 30
 
 Real TVs are slow, at about 3 seconds per key press including a screenshot. So
 10 minutes is a quick look of a few hundred steps, and 30 minutes or more
-finds deeper bugs. When the time is up, FireLab spends up to 20 more minutes
-(`--minimize-minutes`) shrinking each finding. While it runs, it prints new
-screens and findings as it finds them. When it finishes, it prints the
-findings and the path to the report.
+finds deeper bugs. When the time is up, FireLab writes the report straight
+away, then spends up to 5 more minutes per bug (`--minimize-minutes`)
+shrinking each critical or major finding to its shortest key sequence,
+updating the report after each one. Ctrl-C at any point stops and keeps the
+report. While it runs, it prints new screens and findings as it finds them.
 
 ### What it checks, and for which apps
 

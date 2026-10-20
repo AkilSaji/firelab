@@ -70,7 +70,7 @@ ${bold('Emulators')}
 ${bold('Game testing engine')}  (plays your app with the remote; finds crashes, black/frozen screens, focus traps)
   explore --package p | --apk f [--url u] [--minutes 10 | --steps n] [--seed 1] [--keys up,down,...]
           [--oracles health,screen,focus] [--state-expr js] [--focus-selector .focused] [--setup js]
-          [--strategy explore|random|monkey] [--no-minimize] [--minimize-minutes 20] [--fail-on crash,black,frozen,focus-trap]
+          [--strategy explore|random|monkey] [--no-minimize] [--minimize-minutes 5] [--fail-on crash,black,frozen,focus-trap]
           [--baseline <runDir>] [--out dir] [--json]     exit code 1 when a --fail-on finding reproduces
           [--coverage] [--coverage-include <regex>]  V8 JS block coverage: a progress reward and a metric
           [--emulate-gpu AFTSSS]  WebGL reports only that model's GPU features and limits (not speed); failed calls are findings
@@ -305,8 +305,16 @@ async function exploreCommand(lab: FireLab, device: string | undefined, v: Recor
   const reset = s(v.reset);
   if (reset && reset !== 'relaunch' && reset !== 'clear-data') throw new FireLabError('bad-request', '--reset must be relaunch or clear-data');
   if (driverKind === 'browser' && !s(v.url)) throw new FireLabError('bad-request', 'The browser driver needs the game URL: firelab explore --driver browser --url <page>');
-  if (!s(v.package) && !s(v.apk) && driverKind !== 'demo' && driverKind !== 'browser') throw new FireLabError('bad-request', 'Usage: firelab explore --package <id> | --apk <file.apk> [--url <page>] [--minutes 10]', { hint: 'For a web page, wrap it first: firelab wrap --url <url> --name <name> --install <device>, then explore --package dev.firelab.<name> --url <url>' });
+  if (!s(v.package) && !s(v.apk) && driverKind !== 'demo' && driverKind !== 'browser') throw new FireLabError('bad-request', 'Usage: firelab explore --package <id> | --apk <file.apk> [--url <page>] [--minutes 10]', { hint: 'A web game with no device: firelab explore --driver browser --url <page>. On a Fire TV: --package <app.id> (or wrap a web page first: firelab wrap --url <url> --name <name> --install <device>).' });
   const t0 = Date.now();
+  // Ctrl-C stops exploring (or shrinking) and still writes the report; a second Ctrl-C quits at once.
+  const stop = new AbortController();
+  const onInt = () => {
+    if (stop.signal.aborted) process.exit(130);
+    err(yellow('\nStopping: writing the report with what was found so far (Ctrl-C again to quit now)...'));
+    stop.abort();
+  };
+  process.on('SIGINT', onInt);
   const stamp = () => dim(`[${String(Math.floor((Date.now() - t0) / 60000)).padStart(2, '0')}:${String(Math.floor(((Date.now() - t0) / 1000) % 60)).padStart(2, '0')}]`);
   const r = await explore({
     device,
@@ -337,14 +345,17 @@ async function exploreCommand(lab: FireLab, device: string | undefined, v: Recor
     headed: !!v.headed,
     profilesDir: s(v.profiles),
     out: s(v.out),
+    signal: stop.signal,
     onEvent: (e) => {
       if (e.type === 'start') err(`${orange('Exploring')} ${dim(`(${e.strategy}) run ${e.runId} -> ${e.dir}`)}`);
       else if (e.type === 'state') err(`${stamp()} ${green('new state')} ${e.label} ${dim(`(step ${e.step})`)}`);
       else if (e.type === 'finding') err(`${stamp()} ${SEV_COLOR[e.finding.severity]?.(bold(e.finding.severity.toUpperCase())) ?? e.finding.severity} ${e.finding.title} ${dim(`(${e.finding.id}, step ${e.finding.step})`)}`);
       else if (e.type === 'relaunch') err(`${stamp()} ${dim(`relaunch: ${e.reason}`)}`);
-      else if (e.type === 'phase' && e.phase === 'minimize') err(`${stamp()} ${orange('shrinking')} ${e.detail ?? ''}`);
+      else if (e.type === 'phase' && e.phase === 'minimize' && e.detail) err(`${stamp()} ${orange('shrinking')} ${e.detail ?? ''}`);
+      else if (e.type === 'phase' && e.phase === 'report-draft') err(`${stamp()} ${green('report so far:')} ${e.detail ?? ''} ${dim('(updated after each bug is shrunk; Ctrl-C stops shrinking and keeps it)')}`);
     },
   });
+  process.off('SIGINT', onInt);
   if (json) printJson(r);
   else {
     out('');

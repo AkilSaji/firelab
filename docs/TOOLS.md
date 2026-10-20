@@ -238,7 +238,7 @@ Starts FireLab's game-testing engine in the background: it plays the app with th
 | `focusSelector` | string |  | CSS selector of the focused control for apps that draw focus with a class, e.g. ".focused". |
 | `strategy` | `explore` \| `random` |  | "random" is the monkey baseline for comparisons. |
 | `minimize` | boolean |  | Shrink findings afterwards (default true). |
-| `minimizeMinutes` | number |  | Shrink budget per finding (default 20). |
+| `minimizeMinutes` | number |  | Shrink budget per finding, in minutes (default 5). |
 | `emulateGpu` | string |  | A Fire TV model id (e.g. "AFTSSS"): WebGL in the app reports only that model's GPU features and limits (WebGL2, max texture size, extensions, compressed formats, shader precision), not its speed; every WebGL call that fails becomes a gpu-unsupported finding. Useful on the emulator lab, which has the model's RAM and screen but not its GPU. Needs a debuggable WebView. |
 | `driver` | `adb` \| `vda` \| `demo` |  | "adb" (default): Fire OS / Android TV. "vda": Vega OS over the Vega SDK's `vega` CLI; device is then a `vega exec vda devices` serial. Vega has no JS evaluation and FireLab sees the app go only when its process ends; states come from the screen. Not yet run on a real Vega device or the Vega Virtual Device. "demo": Lantern Lake, a simulated TV game with 6 seeded bugs that runs inside FireLab (no device needed; 10 minutes of device time take a few seconds): use it to try FireLab. |
 

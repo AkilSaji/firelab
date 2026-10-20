@@ -70,7 +70,7 @@ export type ExploreEvent =
   | { type: 'state'; step: number; stateId: string; label: string; thumb?: string }
   | { type: 'finding'; finding: Finding }
   | { type: 'relaunch'; reason: string }
-  | { type: 'phase'; phase: 'explore' | 'minimize' | 'report' | 'done'; detail?: string };
+  | { type: 'phase'; phase: 'explore' | 'minimize' | 'report-draft' | 'report' | 'done'; detail?: string };
 
 /** blocks: distinct JS blocks covered so far (with --coverage). */
 export type CoveragePoint = { t: number; step: number; states: number; blocks?: number };

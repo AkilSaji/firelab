@@ -23,6 +23,9 @@ import type { RemoteKey } from './driver.js';
 import { readTrace, replayOnce, replayTrace, traceKeys, type ReplayOptions, type ReplayResult } from './trace.js';
 import { shrinkTrace, type ShrinkResult } from './minimize.js';
 import { writeReport, type ReportOptions } from './report.js';
+
+/** Minutes spent shrinking each bug's key sequence (--minimize-minutes). */
+export const DEFAULT_SHRINK_MIN = 5;
 import { DEMO_PACKAGE } from './demo.js';
 
 export { Explorer, newRunId, readRunDir, writeRunFiles, type ExploreEvent, type ExploreResult, type ExplorerOptions, type CoveragePoint } from './explorer.js';
@@ -259,12 +262,19 @@ export async function explore(req: ExploreRequest): Promise<ExploreSummary> {
         .filter((f) => f.severity === 'critical' || f.severity === 'major') // device time goes to what matters
         .sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity] || a.step - b.step)
         .slice(0, req.minimizeMax ?? 8);
+      // A report right away: shrinking can take minutes per bug, and the
+      // findings are already worth reading (it's rewritten after each one).
+      writeRunFiles(result);
+      const draft = writeReport(result);
+      const budgetMin = config.minimizeBudgetMin ?? DEFAULT_SHRINK_MIN;
+      req.onEvent?.({ type: 'phase', phase: 'report-draft', detail: `${draft.html} · shrinking ${todo.length} bug${todo.length === 1 ? '' : 's'}, up to ${budgetMin} min each` });
       for (const f of todo) {
         if (req.signal?.aborted) break;
         req.onEvent?.({ type: 'phase', phase: 'minimize', detail: `${f.id} ${f.title}` });
-        await shrinkFinding(driver, result.dir, f, { budgetMs: (config.minimizeBudgetMin ?? 20) * 60_000, clock, signal: req.signal, replay: req.replay, allowPackages: config.allowPackages });
+        await shrinkFinding(driver, result.dir, f, { budgetMs: budgetMin * 60_000, clock, signal: req.signal, replay: req.replay, allowPackages: config.allowPackages });
+        writeRunFiles(result);
+        writeReport(result);
       }
-      writeRunFiles(result);
     }
     x.setPhase('report');
     const baseline = req.baseline ? baselineOf(req.baseline) : undefined;

@@ -222,7 +222,8 @@ export async function shrinkTrace(trace: Trace, o: ShrinkOptions): Promise<Shrin
   // 4. Measure the result.
   // Over budget already: a 3-replay rate instead of 5, so the shrink doesn't overrun by much.
   const repro = await rate(steps, stop() ? Math.min(3, o.finalRuns ?? 5) : (o.finalRuns ?? 5));
-  const status: Finding['status'] = repro.hits === 0 ? 'not-reproduced' : repro.hits / repro.runs >= 0.6 ? 'confirmed' : 'flaky';
+  // No replays at all (stopped with Ctrl-C): unknown, not "doesn't reproduce".
+  const status: Finding['status'] = repro.runs === 0 ? 'new' : repro.hits === 0 ? 'not-reproduced' : repro.hits / repro.runs >= 0.6 ? 'confirmed' : 'flaky';
   log(`${before} -> ${steps.length} steps, reproduced ${repro.hits}/${repro.runs}`);
   return { status, before, after: steps.length, tests, ms: clock.now() - t0, rate0, repro, trace: withSteps(steps) };
 }
