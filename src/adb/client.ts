@@ -202,12 +202,13 @@ export class Adb {
   }
 
   /** `adb install -r` (replace). Returns adb's output; throws with the INSTALL_FAILED reason. */
-  async install(serial: string, apkPath: string, opts: { downgrade?: boolean; grant?: boolean } = {}): Promise<string> {
+  async install(serial: string, apkPath: string, opts: { downgrade?: boolean; grant?: boolean; noStreaming?: boolean; timeoutMs?: number } = {}): Promise<string> {
     const args = ['-s', serial, 'install', '-r'];
     if (opts.downgrade) args.push('-d');
     if (opts.grant) args.push('-g');
+    if (opts.noStreaming) args.push('--no-streaming');
     args.push(apkPath);
-    const r = await this.runner.exec(args, { timeoutMs: 300000 });
+    const r = await this.runner.exec(args, { timeoutMs: opts.timeoutMs ?? 300000 });
     const out = `${r.stdout.toString('utf8')}\n${r.stderr}`;
     if (r.code !== 0 || !/\bSuccess\b/.test(out)) {
       const reason = /Failure \[([^\]]+)\]/.exec(out)?.[1] ?? /(INSTALL_[A-Z_]+[^\n]*)/.exec(out)?.[1];

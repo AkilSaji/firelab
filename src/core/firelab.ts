@@ -360,7 +360,16 @@ export class FireLab {
       if (!apk.leanback) warnings.push('No LEANBACK_LAUNCHER activity: the app may not appear on the Fire TV home screen (it can still be launched with launch_app)');
     }
     const before = apk ? undefined : new Set((await listApps(this.adb, serial)).map((a) => a.package));
-    await this.adb.install(serial, file);
+    // A streamed install now and then stalls for good (seen on x86 Android TV
+    // emulators in CI): give it two minutes, then push the file and install it
+    // the old way, which doesn't stream.
+    try {
+      await this.adb.install(serial, file, { timeoutMs: 120_000 });
+    } catch (e) {
+      if (!(e instanceof FireLabError && e.code === 'timeout')) throw e;
+      warnings.push('The streamed install stalled after 120 s; installed again with --no-streaming');
+      await this.adb.install(serial, file, { noStreaming: true, timeoutMs: 180_000 });
+    }
     let pkg = apk?.package;
     if (!pkg && before) pkg = (await listApps(this.adb, serial)).map((a) => a.package).find((p) => !before.has(p));
     if (pkg) recordInstall(this.home, serial, pkg, file);
