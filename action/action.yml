@@ -110,8 +110,13 @@ runs:
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules > /dev/null
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
+        # The trigger applies asynchronously: wait for udev, then set the mode directly if it still hasn't.
+        sudo udevadm settle --timeout=10 || true
+        if [ -e /dev/kvm ] && [ ! -w /dev/kvm ]; then sudo chmod 666 /dev/kvm || true; fi
+        for _ in 1 2 3 4 5; do [ -w /dev/kvm ] && break; sleep 1; done
         if [ ! -w /dev/kvm ]; then
-          echo "::error title=FireLab lab::/dev/kvm is not usable on this runner, so the emulator would be far too slow. Use GitHub's ubuntu-latest (or a larger Linux runner)."
+          if [ -e /dev/kvm ]; then ls -l /dev/kvm; else echo "/dev/kvm does not exist on this runner"; fi
+          echo "::error title=FireLab lab::/dev/kvm is not usable on this runner, so the emulator would be far too slow. Use GitHub's ubuntu-latest (or a larger Linux runner), or re-run the job."
           exit 1
         fi
 
