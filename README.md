@@ -78,7 +78,7 @@ video file.
 | Bugs reported, Firefly Lake (5 seeded) | FireLab **4**, Monkey 2, Random 1 (median of 5 × 10 min; Â12 = 1.00, p ≈ 0.01) | [benchmark](docs/results/benchmark-2026-10-18/) |
 | Game code covered, Firefly Lake | FireLab **120** JS blocks, Monkey 79, Random 74 | [benchmark](docs/results/benchmark-2026-10-18/) |
 | Screens reached, Deep Quest (30-floor RPG) | FireLab **246**, Random 82, Monkey 70; deepest 36 keys vs 13.5 | [benchmark](docs/results/benchmark-2026-10-18/) |
-| A real bug on a real Fire TV | Back quit the app on busy pages: 37 keys shrunk to **8**, reproduced **5/5**, fixed and re-verified **0/5** | [friction log](docs/FRICTION-LOG-FIRELAB.md) |
+| A real bug on a real Fire TV | Back quit the app on busy pages: 37 keys shrunk to **8**, reproduced **5/5** on a 4K Plus; after the fix **0/5** on a 3rd gen and the emulator | [friction log, entry 3](docs/FRICTION-LOG.md#3-handling-back-in-a-webview-tv-app-races) |
 | **No Fire TV at all:** explore in desktop Chrome as a Fire TV Stick 2nd gen | Found that Firefly Lake breaks on that stick: `getContext("webgl2")` refused on the Mali-450, `Error: WebGL2 not available`, render loop stopped | [report](docs/results/no-fire-tv-gpu-emulation-2026-10-19/) |
 | GPU check on a real stick as a 2nd gen | WebGL2 refused on the Mali-450 | [result](docs/results/firetv-stick-3rd-gen-2026-10-19/gpu-check-as-AFTT.json) |
 | Explore on a 1 GB Fire TV Stick (3rd gen) | 44 steps, 4 game states in 3 min at ~3 s per key | [report](docs/results/firetv-stick-3rd-gen-2026-10-19/) |
@@ -87,6 +87,30 @@ video file.
 The benchmark games and their bugs were written by FireLab's authors and five
 runs is a laptop budget, so treat the p-values as indicative. The limits are in
 [docs/BENCHMARK.md](docs/BENCHMARK.md).
+
+## Friction log
+
+What got in our way building and testing Fire TV games on real hardware, in
+the hackathon's format (task, steps, expected vs actual, severity, workaround,
+suggestion). Every number was measured on the device named, and re-checked
+against our run data and logs before publishing.
+**Full log: [docs/FRICTION-LOG.md](docs/FRICTION-LOG.md)** (18 entries and a
+test-session log) and **[docs/FRICTION-LOG-FIRELAB.md](docs/FRICTION-LOG-FIRELAB.md)**
+(24 rough edges in FireLab itself, found by dogfooding it, with what we fixed).
+
+| # | Friction | Measured | Severity |
+|---|---|---|---|
+| 1 | `adb shell input keyevent` is slow, so fast double presses can't be tested | 1.10–1.36 s per key on a 4K Plus, 1.03–1.86 s on a 3rd gen; one batched call of 3 keys: 1.29 s | High |
+| 3 | No documented way for a WebView TV app to say "I handled Back"; the obvious approach races | Back quit the app 5/5 on a 4K Plus; FireLab's fix: 0/5 on a 3rd gen and the emulator | High |
+| 6 | No Fire OS emulator; the Android emulator can't match a 1 GB stick | asked for 1024 MB, got 2473 MB; no arm64 TV image below API 31 | High |
+| 12 | "Play on your phone" party games pick the same ports and crash each other | `BindException: Address already in use`, reproduced 5/5 by `firelab explore` | High |
+| 14 | The emulator renders with a software GPU, nothing like a Fire TV's | WebView 133 on SwiftShader vs PowerVR GE8300 and WebView 138 on the stick | High |
+| 15 | No per-model GPU / WebGL capability table | spec pages name the GPU, not WebGL2, texture limits or formats | High |
+| 4 | Screenshots are slow | full PNG 2.1–2.5 s; FireLab's compressed path 1.2–1.4 s | Medium |
+| 5 | Release builds can't be inspected, so most installed games can't be tested deeply | 5 of 14 games on a 3rd gen were debuggable; 3 of those still had WebView inspection off | Medium |
+| 9 | Per-model memory budgets aren't published | a "1 GB" stick reports 901 MB | Medium |
+| 13 | Games that draw their own highlight are invisible to the accessibility tree | `uiautomator` kept one focused node while the highlight moved | Medium |
+| 17 | The obvious Monkey setting for D-pad apps never presses OK | `--pct-nav 100` sends only arrows; OK, Back and Menu are *majornav* | Medium |
 
 ## Built for the Amazon Developer Hackathon
 

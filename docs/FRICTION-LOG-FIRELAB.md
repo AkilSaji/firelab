@@ -47,14 +47,14 @@ Mitigated (a workaround or a clear message, the cause remains), Open.
 
 ### 1. Testing a web game needed an APK wrapper and a Fire TV
 
-- **What happened:** to explore a web game you had to `firelab wrap` it into an APK (Android build tools, a JDK), install it on a Fire TV or the emulator, then `firelab explore --package`. A developer who just wanted to try FireLab on their game had a 20-minute setup before the first key press.
-- **Fix:** the browser driver (`src/driver/browser.ts`): `firelab explore --driver browser --url <game>` runs the game in headless Chrome at the Fire TV WebView's 960×540 viewport, with keys delivered exactly as FireLab's TV wrapper delivers them (synthetic KeyboardEvents on the focused element; Back as Escape; an unhandled Back goes back in history or leaves the app). About 2.5 key presses per second instead of about 0.4 on a stick. `--headed` shows the window, so you can watch the engine play.
+- **What happened:** to explore a web game you had to `firelab wrap` it into an APK (Android build tools, a JDK), install it on a Fire TV or the emulator, then `firelab explore --package`. A developer who just wanted to try FireLab on their game had a long setup before the first key press.
+- **Fix:** the browser driver (`src/driver/browser.ts`): `firelab explore --driver browser --url <game>` runs the game in headless Chrome at the Fire TV WebView's 960×540 viewport, with keys delivered exactly as FireLab's TV wrapper delivers them (synthetic KeyboardEvents on the focused element; Back as Escape; an unhandled Back goes back in history or leaves the app). About 2 key steps per second (1.8–2.65 in the benchmark) instead of about 0.4 on a stick. `--headed` shows the window, so you can watch the engine play.
 - **Still true:** the browser isn't the Amazon WebView or a Fire TV GPU; findings about speed, memory and the WebView need a device or the emulator.
 
 ### 2. Emulator frame rates looked like results
 
-- **What happened:** `firelab lab` matches a model's RAM, screen and API level, so its numbers look authoritative, but it renders with a software GPU (SwiftShader). On an API 36 image the emulator also raised the RAM we asked for (1024 MB) to 2473 MB.
-- **Mitigation:** every lab command and report prints that frame rates and launch times aren't the device's, and `lab start` warns when the RAM was raised. `firelab fit` with measured profiles is the place for performance.
+- **What happened:** `firelab lab` matches a model's RAM, screen and API level, so its numbers look authoritative, but it renders with the host's GPU (or SwiftShader when headless), not the stick's. On an API 36 image the emulator also raised the RAM we asked for (1024 MB) to 2473 MB.
+- **Mitigation:** `lab start`, `lab doctor` and every smoke report print that frame rates and launch times aren't the device's, and `lab start` warns when the RAM was raised. `firelab fit` with measured profiles is the place for performance.
 
 ## GPU
 
@@ -68,8 +68,8 @@ Mitigated (a workaround or a clear message, the cause remains), Open.
 
 ### 4. The engine stayed shallow on menu-heavy games
 
-- **What happened:** on Deep Quest (nested dialogs and a dungeon), the first engine version reached 27 screens and 5 presses deep in 2 minutes and never pressed OK on the right door. Every focus position counted as its own state, and every state got all ten remote keys.
-- **Fix (docs/ENGINE.md 6.7):** widget-level actions (read the focusable controls once per screen, move the focus to the next untried one and press OK), frontier and log-depth terms in cell selection, longer episodes while they discover, and OK-first / Back-last order. In the benchmark FireLab reaches 246 screens and 36 presses deep in 10 minutes on Deep Quest, against 108 and 16 for the first version.
+- **What happened:** on Deep Quest (nested dialogs and a dungeon), the first engine version reached 27 screens and 5 presses deep in 2 minutes. Every focus position counted as its own state, and every state got all ten remote keys.
+- **Fix (docs/ENGINE.md 6.7):** widget-level actions (read the focusable controls once per screen, move the focus to the next untried one and press OK), frontier and log-depth terms in cell selection, longer episodes while they discover, and OK-first / Back-last order. In the benchmark FireLab reaches a median of 246 screens and 36 presses deep in 10 minutes on Deep Quest, against 108 and 16 for the first version.
 
 ### 5. The focus check used up the key presses
 
@@ -91,7 +91,7 @@ Mitigated (a workaround or a clear message, the cause remains), Open.
 ### 8. A state expression that counts gold made the engine shop forever
 
 - **What happened:** with `--state-expr` returning the bag (as an ordered list) and the gold, every purchase was a new state. The engine kept buying: 318 presses in the shop and 154 in the buy dialog out of 1,478. This is the "noisy TV" problem of novelty-driven explorers.
-- **Mitigation:** the docs and the benchmark subject now show a good state expression: the *set* of items, no counters. Numbers in state expressions are already rounded to one significant digit, but a list that grows with every action still explodes.
+- **Mitigation:** the benchmark subject now uses a good state expression (the *set* of items, no counters; see the comment in `src/bench/subjects.ts`). Numbers in state expressions are already rounded to one significant digit, but a list that grows with every action still explodes.
 - **Open:** detecting a state expression that grows without bound and warning about it.
 
 ### 9. "Back left the app" false alarms
@@ -101,18 +101,18 @@ Mitigated (a workaround or a clear message, the cause remains), Open.
 
 ### 10. Timing and counter bugs don't shrink to a few keys
 
-- **What happened:** Lantern Lake's freeze needs four ▶ presses during one play session, wherever they fall. With a 4-minute shrink budget (about 7 replays of a 35-key trace) delta debugging can't get it down to a few keys; it stays confirmed but long. This also happened with the first engine version.
+- **What happened:** Lantern Lake's freeze needs four ▶ presses since launch, wherever they fall. With a 4-minute shrink budget (about 7 replays at roughly 35 s each) delta debugging can't get it down to a few keys; it stays confirmed but long. This also happened with the first engine version.
 - **Open:** a smarter first cut for this shape (keep only presses of the keys that appear in the trace's last steps), or a larger default budget for confirmed critical findings.
 
 ### 11. Deep bugs aren't reached in 10 minutes
 
-- **What happened:** no strategy, FireLab included, reached Deep Quest's floor-10, -20 and -30 bugs in 10-minute runs. FireLab gets furthest (floor 1-3), but a wrong door costs a return to the last camp. Themis (52 real Android bugs) found the same: most bugs no tool finds need many screen transitions.
+- **What happened:** no strategy, FireLab included, reached Deep Quest's floor-10, -20 and -30 bugs in 10-minute runs. FireLab and its first version reach floors 1-3 at best, but a wrong door costs a return to the last camp. Themis (52 real Android bugs) found the same: most bugs no tool finds need many screen transitions.
 - **Open:** longer runs, per-game checkpoints (a `--setup` expression that loads a save), and LLM help on plateaus (ENGINE.md 6.5).
 
 ### 12. Hidden game state is invisible to the explorer
 
 - **What happened:** Deep Quest's options bug needs "High quality applied" plus Controls › Remap. Nothing on screen tells the explorer the quality changed, so it doesn't know to retry Remap.
-- **Mitigation:** `--state-expr` lets the developer expose the state that matters; the docs explain how to pick it (see 8).
+- **Mitigation:** `--state-expr` lets the developer expose the state that matters; the benchmark subject shows how (see 8).
 
 ## Benchmark
 
@@ -172,7 +172,7 @@ Mitigated (a workaround or a clear message, the cause remains), Open.
 ### 22. Nothing a run learned helped the next game
 
 - **What happened:** every run started from zero: a bug pattern found on one game (e.g. a fast triple OK blanks the screen) wasn't tried on the next.
-- **Fix:** knowledge packs (knowledge/README.md, ENGINE.md 6.8): `firelab learn export` turns confirmed findings into bug patterns and key priors, developers contribute them by pull request (also from MCP `learn_export` or CI), and every explore run tries the patterns early on new screens. No URLs, names, text or screenshots, and nothing is uploaded automatically.
+- **Fix:** knowledge packs (knowledge/README.md, ENGINE.md 6.8): `firelab learn export` turns confirmed findings into bug patterns and key priors, developers contribute them by pull request (also from MCP `learn_export` or CI), and every explore run with a pack installed sometimes tries the patterns first on new screens. No URLs, names, text or screenshots, and nothing is uploaded automatically.
 - **Open:** whether patterns transfer between games is being measured (`firelab bench --knowledge`, a pack learned on one game, tested on another).
 
 ### 23. Shared knowledge could change test results

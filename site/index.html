@@ -6,7 +6,7 @@
 <title>FireLab</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="FireLab plays your Fire TV game with the remote, finds crashes, black screens and focus traps, and hands you each bug as a key sequence you can replay. Open source, MIT.">
-<meta property="og:title" content="FireLab: test your Fire TV game with the remote, automatically">
+<meta property="og:title" content="FireLab: test on every Fire TV GPU, without owning one">
 <meta property="og:description" content="Plays your game on a real Fire TV, shrinks every bug to the shortest repro, and judges 66 Fire TV models from the one stick you own. MIT.">
 <meta property="og:image" content="assets/og.jpg">
 <link rel="icon" href="assets/logo.png">
@@ -109,7 +109,14 @@ h1, h2 { font-weight: 500; text-wrap: balance; }
 .hero .inner { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 22px; }
 .pill { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 6px 0 12px; border-radius: 99px; border: 1px solid var(--hair-2); background: var(--cell); font-size: 13px; color: var(--ink-2); }
 .pill b { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); color: var(--page); font-size: 11px; }
-.hero h1 { font-size: clamp(40px, 6.2vw, 64px); line-height: 1.04; letter-spacing: -0.035em; max-width: 15ch; }
+.hero h1 { font-size: clamp(38px, 6vw, 62px); line-height: 1.05; letter-spacing: -0.035em; max-width: 17ch; display: grid; }
+.hero h1 .ln { grid-area: 1 / 1; display: block; opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .55s ease; }
+.hero h1 .ln.on { opacity: 1; transform: none; }
+.hero h1 .ln.out { opacity: 0; transform: translateY(-14px); }
+.rotor-dots { display: flex; gap: 6px; justify-content: center; }
+.rotor-dots button { width: 22px; height: 4px; padding: 0; border: 0; border-radius: 2px; background: var(--hair-2); cursor: pointer; }
+.rotor-dots button[aria-current="true"] { background: var(--ember); }
+@media (prefers-reduced-motion: reduce) { .hero h1 .ln { transition: none; transform: none; } }
 .hero h1, .hero .sub, .head h2, .band h2 { overflow-wrap: anywhere; }
 .hero .sub { font-size: 18px; color: var(--ink-2); max-width: 46ch; }
 .hero .sub mark { background: var(--chip); color: var(--ink); padding: 1px 6px; border-radius: 6px; }
@@ -314,8 +321,15 @@ footer a { color: var(--ink-2); }
 
   <div class="inner">
     <a class="pill" href="https://github.com/AkilSaji/firelab" target="_blank" rel="noopener">Open source · MIT · 830 tests <b>›</b></a>
-    <h1>Test your Fire TV game <span class="o">with the remote</span></h1>
-    <p class="sub">FireLab plays your game on a real Fire TV, finds the bugs, and shrinks each one to the shortest key sequence that reproduces it. <mark>No TV? It runs on emulators too.</mark></p>
+    <h1 id="rotor" aria-label="Test your game on every Fire TV GPU, without owning one">
+      <span class="ln on">Test on every Fire TV GPU, <span class="o">without owning one</span></span>
+      <span class="ln" aria-hidden="true">Catch the bugs that break <span class="o">on someone else's stick</span></span>
+      <span class="ln" aria-hidden="true">A game-testing engine <span class="o">measured against Monkey</span></span>
+      <span class="ln" aria-hidden="true">One stick in, <span class="o">66 Fire TV verdicts out</span></span>
+      <span class="ln" aria-hidden="true">Every bug, shrunk to <span class="o">the keys that cause it</span></span>
+    </h1>
+    <div class="rotor-dots" role="group" aria-label="Headlines"><button type="button" aria-label="Headline 1" aria-current="true"></button><button type="button" aria-label="Headline 2"></button><button type="button" aria-label="Headline 3"></button><button type="button" aria-label="Headline 4"></button><button type="button" aria-label="Headline 5"></button></div>
+    <p class="sub">FireLab makes your game see any Fire TV model's GPU, in desktop Chrome, an emulator or the stick you have. Then its engine plays the game with the remote and shrinks every bug to the shortest key sequence. <mark>No Fire TV needed to start.</mark></p>
     <div class="ctas">
       <a class="btn go lg" href="#start">Get started</a>
       <a class="btn lg" href="https://github.com/AkilSaji/firelab" target="_blank" rel="noopener">View on GitHub</a>
@@ -594,6 +608,17 @@ cd firelab &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link
   var cb = document.getElementById('copy-cmd'); cb.addEventListener('click', function () { copy(cmd.textContent, cb); });
   var cc = document.getElementById('copy-credit'); cc.addEventListener('click', function () { copy(document.getElementById('credit').textContent, cc, 'Copy credit'); });
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lines = document.querySelectorAll('#rotor .ln'), dots = document.querySelectorAll('.rotor-dots button'), cur = 0, timer = null;
+  function show(i) {
+    if (i === cur) return;
+    lines[cur].classList.remove('on'); lines[cur].classList.add('out'); lines[cur].setAttribute('aria-hidden', 'true');
+    var prev = lines[cur]; setTimeout(function () { prev.classList.remove('out'); }, 600);
+    cur = i; lines[cur].classList.add('on'); lines[cur].removeAttribute('aria-hidden');
+    dots.forEach(function (d, k) { d.setAttribute('aria-current', k === cur ? 'true' : 'false'); });
+  }
+  function start() { if (!reduce) timer = setInterval(function () { show((cur + 1) % lines.length); }, 3200); }
+  dots.forEach(function (d, k) { d.addEventListener('click', function () { clearInterval(timer); show(k); start(); }); });
+  start();
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) { if (reduce || !e.isIntersecting) { e.target.pause(); } else { var p = e.target.play(); if (p && p.catch) p.catch(function () {}); } });
