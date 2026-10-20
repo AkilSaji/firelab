@@ -77,7 +77,7 @@ buttons for hours, on hardware you don't have.
    emulators with a model's RAM, heap, screen and Android version, and the
    GitHub Action can run smoke tests and the engine on every pull request.
 5. **An AI agent can test the TV.** The MCP server gives Claude Code, Kiro,
-   Cursor or VS Code 24 tools to see the screen, press the remote, read the
+   Cursor or VS Code 25 tools to see the screen, press the remote, read the
    WebView console, measure, and run the engine.
 
 ## See it working
@@ -338,7 +338,7 @@ server config. Restart the assistant after changing its config; then ask it
 **More copy-paste prompts** (no Fire TV / emulator setup, fix-and-verify, web
 games, native APKs, performance, every-model fit, CI) are in
 [docs/PROMPTS.md](docs/PROMPTS.md). The `explore_app`, `playtest` and
-`tune_performance` prompts walk an assistant through each. All 24 tools are listed in [docs/TOOLS.md](docs/TOOLS.md).
+`tune_performance` prompts walk an assistant through each. All 25 tools are listed in [docs/TOOLS.md](docs/TOOLS.md).
 Without a global install, use `"command": "npx", "args": ["-y", "firelab", "mcp"]` in any of the configs above.
 
 ### Quick start: TV performance
@@ -675,7 +675,7 @@ See [docs/GPU.md](docs/GPU.md).
  Claude Code / Kiro / Cursor / VS Code        you, in a browser          scripts / CI
             │ MCP (stdio or HTTP)                  │ HTTP + SSE                │
             ▼                                      ▼                           ▼
-   src/mcp (24 tools, 3 prompts)          src/http (dashboard API)       src/cli.ts
+   src/mcp (25 tools, 3 prompts)          src/http (dashboard API)       src/cli.ts
             └────────────────────┬─────────────────┴───────────────────────────┘
                                  ▼
                        src/core FireLab  (devices, sessions, jobs)
