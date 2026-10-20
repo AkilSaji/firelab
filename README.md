@@ -17,6 +17,29 @@ with a measured reproduction rate. Free, local and MIT-licensed.
 **[GPU emulation](docs/GPU.md)** ·
 **[MCP tools](docs/TOOLS.md)**
 
+## Test your own game in 2 minutes (no Fire TV needed)
+
+You need Node 22+ and Chrome (Edge, Brave or Chromium work too). Start your
+game the way you always do, then:
+
+```sh
+npx -y firelab explore --driver browser --url http://localhost:8080/ --minutes 10
+```
+
+FireLab plays it with the remote's keys at the Fire TV's 960×540 viewport and
+writes an HTML report: crashes, uncaught errors, black and frozen screens and
+D-pad focus traps, each with the shortest key sequence that reproduces it.
+
+| Your app | How FireLab tests it |
+| --- | --- |
+| Web game or web app (three.js, Phaser, React, Vite, plain HTML…) | `--driver browser --url <page>`: headless Chrome, **no device** |
+| Fire OS or Android TV app (APK, incl. WebView wrappers) | `firelab connect <tv-ip>`, then `--package <app.id>` or `--apk app.apk`: a real stick or an emulator |
+| Vega OS app (`.vpkg`) | `--driver vda` through the Vega SDK: **experimental, not yet verified on a real Vega device** ([docs/VEGA.md](docs/VEGA.md)). If the app has a web build, test that in browser mode too. |
+
+Not sure what's set up? `npx -y firelab doctor` lists what's ready and the
+exact command for each. With an AI assistant: `claude mcp add firelab -- npx -y firelab mcp`,
+then ask *"Use FireLab's browser driver to explore http://localhost:8080/ for 10 minutes and fix what it finds."*
+
 ## The problem
 
 There are 66 Fire TV models in the wild, from the 1 GB Fire TV Stick with a
@@ -130,10 +153,10 @@ track game, *Sunset Villa*, which FireLab was first built to test.
 ### Try it in 60 seconds, no Fire TV needed
 
 ```sh
-git clone https://github.com/AkilSaji/firelab.git && cd firelab
-npm install
-npm run demo        # the engine plays a simulated TV game with 6 seeded bugs, then opens the report
+npx -y firelab demo    # the engine plays a simulated TV game with seeded bugs, then opens the report
 ```
+
+Or from source: `git clone https://github.com/AkilSaji/firelab.git && cd firelab && npm install && npm run demo`.
 
 It takes about 5 seconds and needs only Node 22+: no Fire TV, no adb, no Android
 SDK. Or skip installing: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/AkilSaji/firelab)
@@ -212,14 +235,15 @@ on. Note the IP address under About > Network.
 android-platform-tools`, `sudo apt install adb`, or
 `winget install Google.PlatformTools`).
 
-Install FireLab from this repository (it isn't on npm yet):
+Install FireLab:
 
 ```sh
-git clone https://github.com/AkilSaji/firelab.git
-cd firelab && npm install && npm run build && npm link   # `firelab` now works in any folder
+npm install -g firelab           # or prefix every command with `npx -y`
 firelab connect 192.168.1.50     # then press "Allow" on the TV, tick "Always allow"
 firelab doctor                   # checks everything, explains any fix
 ```
+
+From source instead: `git clone https://github.com/AkilSaji/firelab.git && cd firelab && npm install && npm run build && npm link`.
 
 **3. Connect your AI assistant (MCP).** FireLab runs as an MCP server on your
 own computer: the assistant starts it, and it talks to the TV over adb. Nothing
@@ -229,7 +253,7 @@ goes to a cloud service. Add it once:
 <summary><b>Claude Code</b></summary>
 
 ```sh
-claude mcp add firelab -- firelab mcp
+claude mcp add firelab -- npx -y firelab mcp     # or `-- firelab mcp` after npm install -g
 ```
 
 or in `.mcp.json` in your project:
@@ -315,7 +339,7 @@ server config. Restart the assistant after changing its config; then ask it
 games, native APKs, performance, every-model fit, CI) are in
 [docs/PROMPTS.md](docs/PROMPTS.md). The `explore_app`, `playtest` and
 `tune_performance` prompts walk an assistant through each. All 24 tools are listed in [docs/TOOLS.md](docs/TOOLS.md).
-When FireLab is published on npm, `npx -y firelab mcp` will work without cloning.
+Without a global install, use `"command": "npx", "args": ["-y", "firelab", "mcp"]` in any of the configs above.
 
 ### Quick start: TV performance
 

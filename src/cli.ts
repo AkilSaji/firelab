@@ -11,6 +11,8 @@ import { findAdb, adbCandidates, ADB_INSTALL_HINT } from './adb/locate.js';
 import { localInterfaces, defaultScanRanges } from './adb/discovery.js';
 import { REMOTE_KEY_NAMES } from './adb/keys.js';
 import type { Device } from './core/types.js';
+import { findChrome, chromeCandidates } from './driver/browser.js';
+import { findVega } from './vega/runner.js';
 
 const color = process.stdout.isTTY && !process.env.NO_COLOR;
 const c = (code: number) => (s: string) => (color ? `\x1b[${code}m${s}\x1b[0m` : s);
@@ -138,13 +140,23 @@ async function doctor(lab: FireLab, json: boolean, adbOverride?: string): Promis
     detail: `v${process.versions.node}`,
     fix: major >= 22 ? undefined : ['WebView features need Node 22+ (built-in WebSocket). Install Node 22 LTS or newer, or run Node 20 with --experimental-websocket.'],
   });
+  // Browser mode needs no device at all: a web game in headless Chrome at the
+  // Fire TV viewport. Say so first, so nobody thinks FireLab needs a Fire TV.
+  const chrome = findChrome();
+  checks.push({
+    name: 'Browser mode (no device)',
+    ok: chrome ? true : 'warn',
+    detail: chrome ? `ready, using ${chrome}` : 'no Chrome, Edge, Brave or Chromium found',
+    fix: chrome ? undefined : ['Install Google Chrome (or Edge, Brave, Chromium), or run `npx playwright install chromium`, or set CHROME_PATH to the browser binary.', `Looked in: ${chromeCandidates().slice(0, 5).join(', ')}, ...`],
+  });
+  // adb is only for a real Fire TV / Android TV: missing it is a warning, not a failure.
   const adbPath = adbOverride ?? findAdb();
   if (!adbPath) {
-    checks.push({ name: 'adb', ok: false, detail: 'not found', fix: [ADB_INSTALL_HINT, `Looked in: ${adbCandidates({ env: process.env, platform: process.platform, home: process.env.HOME ?? '' }).slice(0, 6).join(', ')}, ...`] });
+    checks.push({ name: 'adb (Fire TV / Android TV)', ok: 'warn', detail: 'not found: only needed to test on a real device or emulator', fix: [ADB_INSTALL_HINT, `Looked in: ${adbCandidates({ env: process.env, platform: process.platform, home: process.env.HOME ?? '' }).slice(0, 6).join(', ')}, ...`] });
   }
   const health = await lab.health();
-  if (health.adb) checks.push({ name: 'adb', ok: true, detail: `${health.adb.version} at ${health.adb.path}` });
-  else if (adbPath) checks.push({ name: 'adb', ok: false, detail: health.error ?? 'not working', fix: health.error?.includes(ADB_INSTALL_HINT) ? undefined : [ADB_INSTALL_HINT] });
+  if (health.adb) checks.push({ name: 'adb (Fire TV / Android TV)', ok: true, detail: `${health.adb.version} at ${health.adb.path}` });
+  else if (adbPath) checks.push({ name: 'adb (Fire TV / Android TV)', ok: 'warn', detail: health.error ?? 'not working', fix: health.error?.includes(ADB_INSTALL_HINT) ? undefined : [ADB_INSTALL_HINT] });
   const ifaces = localInterfaces();
   checks.push({
     name: 'Network',
@@ -158,7 +170,7 @@ async function doctor(lab: FireLab, json: boolean, adbOverride?: string): Promis
     const ready = devices.filter((d) => d.state === 'device');
     const unauth = devices.filter((d) => d.state === 'unauthorized');
     const off = devices.filter((d) => d.state === 'offline' || d.state === 'connecting');
-    if (!devices.length) checks.push({ name: 'Devices', ok: false, detail: 'none connected', fix: FIRE_TV_ADB_STEPS });
+    if (!devices.length) checks.push({ name: 'Devices', ok: 'warn', detail: 'none connected (fine for browser mode)', fix: FIRE_TV_ADB_STEPS });
     else checks.push({ name: 'Devices', ok: ready.length ? true : 'warn', detail: devices.map((d) => `${d.id} ${d.state}${d.name ? ` (${d.name})` : ''}`).join('; ') });
     if (unauth.length) {
       checks.push({
@@ -191,8 +203,18 @@ async function doctor(lab: FireLab, json: boolean, adbOverride?: string): Promis
   } catch {
     /* wrap not built: nothing to check */
   }
+  const vega = findVega();
+  checks.push({ name: 'Vega OS (experimental)', ok: true, detail: vega ? `vega CLI at ${vega}: --driver vda (not yet verified on a real Vega device)` : 'vega CLI not found: only needed for Vega OS apps (docs/VEGA.md)' });
+  const deviceReady = devices.some((d) => d.state === 'device');
+  const modes = [
+    chrome ? 'browser: `firelab explore --driver browser --url http://localhost:8080/ --minutes 10`' : null,
+    deviceReady ? 'Fire TV / Android TV: `firelab explore --package <your.app.id> --minutes 10`' : null,
+    vega ? 'Vega OS: `firelab explore --driver vda --package <your.app.id>` (experimental)' : null,
+    'demo (no setup): `firelab demo`',
+  ].filter((x): x is string => !!x);
+  if (!chrome && !deviceReady) checks.push({ name: 'Ready to test', ok: false, detail: 'no browser and no device yet: only `firelab demo` will run', fix: ['Install Chrome (browser mode, quickest), or connect a Fire TV with adb.'] });
   if (json) {
-    printJson({ ok: checks.every((x) => x.ok !== false), checks });
+    printJson({ ok: checks.every((x) => x.ok !== false), checks, modes });
   } else {
     out(bold(`FireLab doctor (v${firelabVersion()})`));
     for (const ch of checks) {
@@ -200,7 +222,8 @@ async function doctor(lab: FireLab, json: boolean, adbOverride?: string): Promis
       out(`${mark} ${bold(ch.name)}: ${ch.detail}`);
       for (const [i, f] of (ch.fix ?? []).entries()) out(`     ${ch.fix && ch.fix.length > 1 ? `${i + 1}. ` : ''}${f}`);
     }
-    if (checks.every((x) => x.ok !== false)) out(green('\nAll set. Try `firelab screenshot` or `firelab ui`.'));
+    out(bold('\nReady to test:'));
+    for (const m of modes) out(`  - ${m}`);
   }
   return checks.every((x) => x.ok !== false) ? 0 : 1;
 }
@@ -264,7 +287,9 @@ async function demoCommand(v: Record<string, string | boolean | string[] | undef
     for (const f of sm.findings.filter((x) => x.severity !== 'info')) out(`  ${(SEV_COLOR[f.severity] ?? ((x: string) => x))(f.severity.padEnd(8))} ${f.title}${dim(`  (${f.keys.length} key${f.keys.length === 1 ? '' : 's'}: ${f.keys.slice(0, 8).join(' ')}${f.keys.length > 8 ? ' …' : ''}${f.repro ? `; reproduced ${f.repro.hits}/${f.repro.runs}` : ''})`)}`);
     out('');
     out(`Report: ${bold(sm.report.html)}`);
-    out(dim('Next: connect a Fire TV (firelab devices --scan --connect) or an emulator (firelab lab), then firelab explore --package <your.app>.'));
+    out(dim('Next, test your own game:'));
+    out(dim('  web game, no device:  firelab explore --driver browser --url http://localhost:8080/ --minutes 10'));
+    out(dim('  on a Fire TV:         firelab connect <tv-ip>, then firelab explore --package <your.app.id> --minutes 10'));
   }
   if (process.env.CODESPACES && !json) out(dim('In Codespaces: open the report file in the Explorer, right-click it and choose "Show Preview" (Live Preview).'));
   else if (!v['no-open'] && !json && !process.env.CI) openBrowser(`file://${sm.report.html}`);

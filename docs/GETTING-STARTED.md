@@ -10,15 +10,18 @@ You need a Fire TV (any model), a computer on the same Wi-Fi, Node 22+ and adb
 `winget install Google.PlatformTools`). If you don't have a Fire TV yet, read
 steps 1 and 2, then go to [step 7](#7-no-tv-or-ci-the-lab-and-the-github-action).
 
-Until FireLab is on npm, install it from source:
+Install it:
 
 ```sh
-git clone https://github.com/AkilSaji/firelab.git && cd firelab && npm install && npm run build && npm link
+npm install -g firelab        # or put `npx -y` in front of each command instead
 ```
 
-**Just want to see it work first?** `npm run demo` (in the cloned folder, no
-TV needed) runs the engine on a simulated TV game with six seeded bugs and opens
-the report in about five seconds.
+(From source: `git clone https://github.com/AkilSaji/firelab.git && cd firelab && npm install && npm run build && npm link`.)
+
+**No Fire TV?** Test a web game in headless Chrome at the Fire TV viewport:
+`firelab explore --driver browser --url http://localhost:8080/ --minutes 10`.
+**Just want to see it work first?** `firelab demo` runs the engine on a
+simulated TV game with seeded bugs and opens the report in about five seconds.
 
 ## The journey at a glance
 
@@ -303,7 +306,7 @@ Details are in [LAB.md](LAB.md).
 press the remote, read the console, measure, sweep and run `explore`.
 
 ```sh
-claude mcp add firelab -- firelab mcp      # needs `npm link` from the install step
+claude mcp add firelab -- npx -y firelab mcp   # or `-- firelab mcp` after npm install -g
 ```
 
 It runs on your computer, next to adb; nothing goes to a cloud service. The

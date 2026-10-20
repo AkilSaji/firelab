@@ -55,19 +55,47 @@ export function keyScript(type: 'keydown' | 'keyup', k: [string, string, number]
   return `(function(){var e=new KeyboardEvent('${type}',{key:'${key}',code:'${code}',repeat:${repeat},bubbles:true,cancelable:true});try{Object.defineProperty(e,'keyCode',{get:function(){return ${keyCode}}});Object.defineProperty(e,'which',{get:function(){return ${keyCode}}});}catch(x){}var t=document.activeElement||document.body||document.documentElement;return !t.dispatchEvent(e);})()`;
 }
 
-export function findChrome(explicit?: string): string | undefined {
-  const c = [
-    explicit,
-    process.env.CHROME_PATH,
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+/** Every place a Chromium-based browser usually lives (Chrome, Chromium, Edge, Brave, and Playwright's own download). */
+export function chromeCandidates(env: NodeJS.ProcessEnv = process.env, home = os.homedir()): string[] {
+  const mac = ['Google Chrome.app/Contents/MacOS/Google Chrome', 'Chromium.app/Contents/MacOS/Chromium', 'Microsoft Edge.app/Contents/MacOS/Microsoft Edge', 'Brave Browser.app/Contents/MacOS/Brave Browser', 'Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'];
+  const win = ['Google\\Chrome\\Application\\chrome.exe', 'Microsoft\\Edge\\Application\\msedge.exe', 'BraveSoftware\\Brave-Browser\\Application\\brave.exe', 'Chromium\\Application\\chrome.exe'];
+  const winRoots = [env.PROGRAMFILES ?? 'C:\\Program Files', env['PROGRAMFILES(X86)'] ?? 'C:\\Program Files (x86)', env.LOCALAPPDATA].filter((x): x is string => !!x);
+  return [
+    env.CHROME_PATH,
+    env.PUPPETEER_EXECUTABLE_PATH,
+    ...mac.map((a) => `/Applications/${a}`),
+    ...mac.map((a) => path.join(home, 'Applications', a)),
     '/usr/bin/google-chrome',
     '/usr/bin/google-chrome-stable',
     '/usr/bin/chromium',
     '/usr/bin/chromium-browser',
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    '/snap/bin/chromium',
+    '/usr/bin/microsoft-edge',
+    '/usr/bin/brave-browser',
+    ...winRoots.flatMap((r) => win.map((a) => `${r}\\${a}`)),
+    ...playwrightChromes(env, home),
   ].filter((x): x is string => !!x);
-  return c.find((p) => fs.existsSync(p));
+}
+
+/** Chromium downloaded by `npx playwright install chromium` (newest first). */
+function playwrightChromes(env: NodeJS.ProcessEnv, home: string): string[] {
+  const roots = [env.PLAYWRIGHT_BROWSERS_PATH, path.join(home, 'Library', 'Caches', 'ms-playwright'), path.join(home, '.cache', 'ms-playwright'), env.LOCALAPPDATA && path.join(env.LOCALAPPDATA, 'ms-playwright')].filter((x): x is string => !!x);
+  const inside = ['chrome-mac/Chromium.app/Contents/MacOS/Chromium', 'chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing', 'chrome-mac-x64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing', 'chrome-linux/chrome', 'chrome-linux64/chrome', 'chrome-win/chrome.exe', 'chrome-win64/chrome.exe'];
+  const out: string[] = [];
+  for (const r of roots) {
+    let dirs: string[] = [];
+    try {
+      dirs = fs.readdirSync(r).filter((d) => /^chromium-\d+$/.test(d)).sort((a, b) => Number(b.split('-')[1]) - Number(a.split('-')[1]));
+    } catch {
+      continue;
+    }
+    for (const d of dirs) out.push(...inside.map((i) => path.join(r, d, i)));
+  }
+  return out;
+}
+
+export function findChrome(explicit?: string): string | undefined {
+  return [explicit, ...chromeCandidates()].filter((x): x is string => !!x).find((p) => fs.existsSync(p));
 }
 
 const LAUNCHER = 'browser.launcher';
@@ -102,7 +130,7 @@ export class BrowserDriver implements DeviceDriver {
   private async ensureBrowser(): Promise<void> {
     if (this.browserWs && !this.browserWs.closed) return;
     const bin = findChrome(this.o.chrome);
-    if (!bin) throw new FireLabError('unsupported', 'No Chrome or Chromium found for the browser driver', { hint: 'Install Google Chrome, or set CHROME_PATH to a Chrome/Chromium binary' });
+    if (!bin) throw new FireLabError('unsupported', 'No Chrome or Chromium found for the browser driver', { hint: 'Install Google Chrome (or Edge, Brave, Chromium), run `npx playwright install chromium`, or set CHROME_PATH to the browser binary. `firelab doctor` shows where it looked.' });
     this.profileDir = fs.mkdtempSync(path.join(os.tmpdir(), 'firelab-browser-'));
     const args = [
       ...(this.o.headed ? [] : ['--headless=new']),

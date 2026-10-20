@@ -537,12 +537,14 @@ footer a { color: var(--ink-2); }
 <div class="marker pad" id="start"><b>04</b> / 05 · Get started</div>
 <div class="start">
   <div>
-<pre class="code"><span class="c"># get it (Node 22+ and adb)</span>
-<span class="k">git clone</span> https://github.com/AkilSaji/firelab
-cd firelab &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link
+<pre class="code"><span class="c"># no Fire TV? test your web game in headless Chrome (Node 22+)</span>
+<span class="k">npx</span> -y firelab explore --driver browser --url http://localhost:8080/
 
-<span class="c"># no TV? the engine on a simulated game</span>
-<span class="k">npm run</span> demo
+<span class="c"># or watch the engine on a simulated game</span>
+<span class="k">npx</span> -y firelab demo
+
+<span class="c"># install it for a real Fire TV (needs adb)</span>
+<span class="k">npm</span> install -g firelab
 
 <span class="c"># your Fire TV: Developer options → ADB debugging</span>
 <span class="k">firelab</span> devices --scan --connect
@@ -551,15 +553,15 @@ cd firelab &amp;&amp; npm install &amp;&amp; npm run build &amp;&amp; npm link
 <span class="k">firelab</span> explore --package com.example.game</pre>
   </div>
   <div style="display:grid;gap:16px;align-content:start">
-    <h3 style="font-weight:500;font-size:22px;letter-spacing:-0.02em">From clone to first bug in minutes</h3>
+    <h3 style="font-weight:500;font-size:22px;letter-spacing:-0.02em">From install to first bug in minutes</h3>
     <p style="color:var(--ink-2)">The step-by-step guide covers TV setup, getting your app on the TV, reading the report, performance, every-model checks, emulators and CI.</p>
     <div class="ctas" style="justify-content:flex-start">
       <a class="btn go" href="https://codespaces.new/AkilSaji/firelab?quickstart=1" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.5v11l9-5.5-9-5.5Z"/></svg>Open in Codespaces</a>
       <a class="btn" href="https://github.com/AkilSaji/firelab/blob/main/docs/GETTING-STARTED.md" target="_blank" rel="noopener">Read the guide</a>
-      <a class="btn" href="https://github.com/AkilSaji/firelab/archive/refs/heads/main.zip">Download ZIP</a>
+      <a class="btn" href="https://www.npmjs.com/package/firelab" target="_blank" rel="noopener">npm package</a>
     </div>
-    <p style="color:var(--ink-2);font-size:14px">Then add it to Claude Code (after <code>npm link</code> above):</p>
-    <div class="cmdline">claude mcp add firelab -- firelab mcp</div>
+    <p style="color:var(--ink-2);font-size:14px">Add it to Claude Code (no clone needed):</p>
+    <div class="cmdline">claude mcp add firelab -- npx -y firelab mcp</div>
   </div>
 </div>
 

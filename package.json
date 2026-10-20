@@ -41,7 +41,7 @@
     "test:watch": "vitest",
     "test:all": "vitest run && npm test --workspaces --if-present",
     "start": "node dist/cli.js",
-    "prepublishOnly": "npm run build && npm test",
+    "prepublishOnly": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && npm run build && npm test",
     "device:check": "npm run build && node scripts/device-check.mjs",
     "vega:check": "npm run build && node scripts/vega-check.mjs",
     "docs:tools": "npm run build && node scripts/gen-tools-doc.mjs",
@@ -69,9 +69,20 @@
     "jpeg-js": "^0.4.4",
     "zod": "^4.1.0"
   },
+  "bundleDependencies": [
+    "@firelab/perf"
+  ],
   "devDependencies": {
     "@types/node": "^22.10.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkilSaji/firelab.git"
+  },
+  "homepage": "https://github.com/AkilSaji/firelab#readme",
+  "bugs": {
+    "url": "https://github.com/AkilSaji/firelab/issues"
   }
 }
