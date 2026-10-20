@@ -294,6 +294,11 @@ export async function prepareForTests(adb: string, serial: string): Promise<void
     'settings put secure screensaver_enabled 0',
     // Phone images show a "Viewing full screen" dialog over immersive apps.
     'settings put secure immersive_mode_confirmations confirmed',
+    // No "verify this app" step or consent prompt on adb installs: on API 30
+    // images it can wait for a click nobody makes, and the install hangs.
+    'settings put global verifier_verify_adb_installs 0',
+    'settings put global package_verifier_enable 0',
+    'settings put global package_verifier_user_consent -1',
     'svc power stayon true',
     'input keyevent KEYCODE_WAKEUP',
     'wm dismiss-keyguard',

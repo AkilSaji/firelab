@@ -10,7 +10,7 @@ import jpeg from 'jpeg-js';
 import type { FireLab } from '../core/firelab.js';
 import { pidOf } from '../adb/apps.js';
 import { sleep } from '../lib/util.js';
-import { errorMessage } from '../lib/errors.js';
+import { FireLabError, errorMessage } from '../lib/errors.js';
 
 export type CheckStatus = 'pass' | 'warn' | 'fail' | 'skip';
 export type SmokeCheck = { id: string; title: string; status: CheckStatus; detail: string; value?: number };
@@ -133,6 +133,20 @@ export async function runSmoke(lab: FireLab, o: SmokeOptions): Promise<SmokeResu
       for (const w of r.warnings) notes.push(w);
     } catch (e) {
       const msg = errorMessage(e);
+      // A hung install usually means a dialog on the device is waiting for a
+      // click: say which window has focus and keep a screenshot of it.
+      if (e instanceof FireLabError && e.code === 'timeout') {
+        const focus = await sh('dumpsys window | grep -E "mCurrentFocus|mFocusedApp"', 15000).catch(() => '');
+        if (focus.trim()) notes.push(`While the install hung, the device showed: ${focus.trim().replace(/\s+/g, ' ')}`);
+        try {
+          const shot = await lab.screenshot(serial, { format: 'jpeg', width: 1920, quality: 85 });
+          const file = path.join(o.outDir, 'screenshot.jpg');
+          fs.writeFileSync(file, shot.data);
+          result.screenshot = file;
+        } catch {
+          /* no screenshot either: the device itself is stuck */
+        }
+      }
       checks.push({
         id: 'install',
         title: 'Installs',
